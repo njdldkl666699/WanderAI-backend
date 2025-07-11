@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import re
 import sys
@@ -21,12 +22,19 @@ class ColoredFormatter(logging.Formatter):
     }
 
     def format(self, record):
-        # 添加颜色
-        log_color = self.COLORS.get(record.levelname, self.COLORS["RESET"])
-        record.levelname = f"{log_color}{record.levelname}{self.COLORS['RESET']}"
+        # 创建 record 的副本，避免修改原始 record
+        import copy
 
-        # 使用父类格式化
-        return super().format(record)
+        record_copy = copy.copy(record)
+
+        # 为副本添加颜色
+        log_color = self.COLORS.get(record_copy.levelname, self.COLORS["RESET"])
+        record_copy.levelname = (
+            f"{log_color}{record_copy.levelname}{self.COLORS['RESET']}"
+        )
+
+        # 使用父类格式化副本
+        return super().format(record_copy)
 
 
 def setup_logging():
@@ -99,20 +107,22 @@ def create_console_handler():
 
 def create_file_handler():
     """创建文件处理器"""
+
     # 创建文件格式器
     file_formatter = logging.Formatter(
         FORMAT,
         datefmt=DATEFMT,
     )
-    # 创建文件处理器
-    file_handler = TimedRotatingFileHandler(
-        filename=FILE_PREFIX, when=ROLL_WHEN, interval=INTERVAL  # 每天午夜切割日志
+
+    # 生成带日期的文件名
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    daily_filename = f"{FILE_PREFIX}.{current_date}.log"
+
+    # 使用普通的 FileHandler，每天程序启动时自动创建新文件
+    file_handler = logging.FileHandler(
+        filename=daily_filename, mode="a", encoding="utf-8"
     )
     file_handler.setFormatter(file_formatter)
-    # 设置日志文件后缀
-    file_handler.suffix = FILE_SUFFIX
-    # 匹配日期格式的日志文件
-    file_handler.extMatch = re.compile(SUFFIX_REGEX)
 
     return file_handler
 
