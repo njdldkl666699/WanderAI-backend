@@ -15,6 +15,9 @@ class UserLoginDTO(BaseModel):
     account_id: str = Field(description="用户名", alias="accountId")
     password: str = Field(description="用户密码")
 
+class UserUpdateDTO(BaseModel):
+    """用户修改昵称DTO"""
+    newNickname: str = Field(description="用户新昵称")
 
 class ChatMessageDTO(BaseModel):
     """用户发送的最新消息"""

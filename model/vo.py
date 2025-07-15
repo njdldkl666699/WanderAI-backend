@@ -6,11 +6,11 @@ from pydantic.alias_generators import to_camel
 class UserLoginVO(BaseModel):
     """用户登录VO"""
     nickname: str = Field(description="用户昵称")
-    account_id: int = Field(description="用户账号ID")
+    token: str = Field(description="用户令牌")
 
 class UserRegisterVO(BaseModel):
     """用户注册VO"""
-    account_id: int = Field(description="用户账号ID")
+    account_id: str = Field(description="用户账号ID")
 
 class CreateSessionVO(BaseModel):
     """创建会话VO"""
