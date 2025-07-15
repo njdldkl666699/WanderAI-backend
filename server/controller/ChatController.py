@@ -27,7 +27,7 @@ async def get_models():
 
 @router.post("/{sessionId}")
 async def chat(
-    chat_message_dto: ChatMessageDTO, session_id: str = Path(..., alias="sessionID")
+    chat_message_dto: ChatMessageDTO, session_id: str = Path(..., alias="sessionId")
 ):
     """发送消息到指定会话"""
     log.info(f"会话ID: {session_id}, 使用模型: {chat_message_dto.model}")
