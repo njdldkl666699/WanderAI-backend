@@ -1,16 +1,7 @@
-from sqlalchemy import DATETIME, DECIMAL, INT, VARCHAR, Column, Null
+from sqlalchemy import DATETIME, INT, VARCHAR, Column, Null
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
-
-
-class StudentModel(Base):
-    __tablename__ = "student"
-
-    ID = Column(VARCHAR(5), primary_key=True)
-    name = Column(VARCHAR(20), nullable=False)
-    dept_name = Column(VARCHAR(20))
-    tot_cred = Column(DECIMAL(3, 0))
 
 
 class UserModel(Base):
