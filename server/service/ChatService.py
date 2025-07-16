@@ -9,14 +9,27 @@ from common.log import log
 from model.dto import ChatMessageDTO
 from model.result import StreamResult
 from model.vo import CreateSessionVO
+from model.entity import UserHistory
+from common.context import BaseContext
+from server.mapper import UserHistoryMapper
 
 
-def create_session() -> CreateSessionVO:
+async def create_session() -> CreateSessionVO:
     """创建一个新的会话"""
     # uuid4生成一个唯一的会话ID
     session_id = str(uuid.uuid4())
+    #将新session_id存储到数据库中
+    account_id=BaseContext.get_account_id()
+    if not account_id:
+        raise ValueError("Account ID is Null")
+    else:
+        new_user_history = UserHistory(account_id=account_id, session_id=session_id)
+        await UserHistoryMapper.create_user_history(new_user_history)
+
     # 返回创建会话的VO对象
-    return CreateSessionVO(session_id=session_id)
+    return CreateSessionVO(session_id=session_id)  # 生成session_id放到数据库
+
+
 
 
 async def stream_chat(chat_message_dto: ChatMessageDTO, session_id: str):
