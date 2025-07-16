@@ -39,6 +39,7 @@ TOKEN_NAME = os.getenv("TOKEN_NAME", "Authentication")  # JWT令牌名称
 # JWT校验白名单
 WHITELIST_PATHS: Set[str] = {
     "/api/user/login",
+    "/api/user/register",
     "/docs",
     "/redoc",
     "/openapi.json",
@@ -48,7 +49,7 @@ WHITELIST_PATHS: Set[str] = {
 
 
 # 大模型配置
-QWEN_API_KEY = os.getenv("API_KEY", "")
+QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
 QWEN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
 # 地图API配置

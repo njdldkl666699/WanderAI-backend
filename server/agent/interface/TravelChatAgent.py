@@ -1,4 +1,5 @@
 import json
+from typing import Any, Tuple
 from server.agent.graph import create_travel_plan_graph
 from server.agent.model import FinalOutput
 from langgraph.graph.state import CompiledStateGraph
@@ -40,58 +41,44 @@ async def get_or_create_state(
 async def travel_plan_or_chat(session_id: str, message: str):
     """进行一次旅行计划或聊天交互"""
     # 创建旅行计划图
-    app = await create_travel_plan_graph()
-    # 获取初始状态
-    initial_state = await get_or_create_state(app, message, thread_id=session_id)
+    async with create_travel_plan_graph() as app:
+        # 获取初始状态
+        initial_state = await get_or_create_state(app, message, thread_id=session_id)
 
-    # 初始化当前节点
-    current_node: str = ""
+        # 初始化当前节点
+        current_node: str = ""
 
-    # 使用混合流式处理模式
-    async for chunk in app.astream(
-        initial_state,
-        config=RunnableConfig(configurable={"thread_id": session_id}),
-        stream_mode=["updates", "messages"],
-        subgraphs=True,
-    ):
-        # 检查是否是消息流（用于 chat 节点的 token 流式输出）
-        if hasattr(chunk, "content"):
-            # 这是来自 chat 节点的流式消息
-            print(chunk.content, end="", flush=True)
-            continue
+        # 使用astream方法进行流式处理
+        # 使用混合流式处理模式
+        async for chunk in app.astream(
+            initial_state,
+            config=RunnableConfig(configurable={"thread_id": session_id}),
+            stream_mode=["updates", "messages"],
+            subgraphs=True,
+        ):
+            (_, stream_mode, message_tuple) = chunk
+            if stream_mode == "updates":
+                message_dict: dict[str, Any] = message_tuple  # type: ignore
+                # 这里得到了TravelPlanState的更新
+                # current_state: TravelPlanState = message_dict["intent_recognition"]
+                keys = message_dict.keys()
+                print(f"\n\n状态更新: {keys}\n")
 
-        # 处理节点状态更新
-        for node_name, node_output in chunk.items():
-            # chat 节点特殊处理 - 流式输出 token
-            if node_name == "chat" or "chat" in node_name:
-                # 对于 chat 节点，处理流式消息
-                if isinstance(node_output, dict) and "messages" in node_output:
-                    for message in node_output["messages"]:
-                        if hasattr(message, "content") and message.content:
-                            print(message.content, end="", flush=True)
-                elif hasattr(node_output, "content") and node_output.content:
-                    print(node_output.content, end="", flush=True)
-            else:
-                # 其他节点 - 状态更新时输出
+            if stream_mode == "messages":
+                (message_chunk, metadata) = message_tuple  # type: ignore
+                metadata: dict[str, Any] = metadata
+                node_name = metadata["langgraph_node"]
                 if current_node != node_name:
+                    print(f"\n{"#"*20} 当前节点：{node_name} {"#"*20}\n")
                     current_node = node_name
-                    print(f"\n{'='*20} 已完成节点: {current_node} {'='*20}\n")
 
-                    # 输出节点完成后的状态信息
-                    if isinstance(node_output, dict):
-                        # 可以选择性输出一些关键信息
-                        if "intent_type" in node_output:
-                            print(f"意图类型: {node_output['intent_type']}")
-                        if "location" in node_output and node_output["location"]:
-                            print(f"目的地: {node_output['location']}")
-                        if "duration" in node_output and node_output["duration"]:
-                            print(f"行程天数: {node_output['duration']}")
-                    print()  # 换行
+                if current_node == "chat":
+                    print(message_chunk.content, end="", flush=True)
 
-    # 最终状态
-    final_state = await app.aget_state({"configurable": {"thread_id": session_id}})
+        # 最终状态
+        final_state = await app.aget_state({"configurable": {"thread_id": session_id}})
 
-    if final_state and final_state.values:
-        final_output_dict = final_state.values.get("final_output", "")
-        print("\n\n最终输出:")
-        print(json.dumps(final_output_dict, ensure_ascii=False, indent=2))
+        if final_state and final_state.values:
+            final_output_dict = final_state.values.get("final_output", "")
+            print("\n\n最终输出:")
+            print(json.dumps(final_output_dict, ensure_ascii=False, indent=2))

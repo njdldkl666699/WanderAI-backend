@@ -1,22 +1,7 @@
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 
-from common.properties import (
-    CHAT_LLM_NAME,
-    CHAT_TEMPERATURE,
-    EXECUTOR_LLM_NAME,
-    EXECUTOR_TEMPERATURE,
-    HOTSPOT_LLM_NAME,
-    HOTSPOT_TEMPERATURE,
-    INTENT_LLM_NAME,
-    INTENT_TEMPERATURE,
-    PLAN_LLM_NAME,
-    PLAN_TEMPERATURE,
-    QWEN_API_KEY,
-    QWEN_BASE_URL,
-    SUMMARY_LLM_NAME,
-    SUMMARY_TEMPERATURE,
-)
+from common.properties import *
 
 hotspot_llm = ChatOpenAI(
     model=HOTSPOT_LLM_NAME,

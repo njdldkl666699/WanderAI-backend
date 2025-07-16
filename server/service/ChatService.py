@@ -9,6 +9,7 @@ from common.log import log
 from model.dto import ChatMessageDTO
 from model.result import StreamResult
 from model.vo import CreateSessionVO
+from server.agent.interface import TravelChatAgent
 
 
 def create_session() -> CreateSessionVO:
@@ -22,9 +23,9 @@ def create_session() -> CreateSessionVO:
 async def stream_chat(chat_message_dto: ChatMessageDTO, session_id: str):
     """异步流式聊天生成器"""
     message = chat_message_dto.message
-    # 检查会话ID是否存在
-    if not model:
-        raise ModelNotFoundException(MODEL_CANNOT_BE_EMPTY)
+    # # 检查会话ID是否存在
+    # if not model:
+    #     raise ModelNotFoundException(MODEL_CANNOT_BE_EMPTY)
     # 检查消息内容是否为空
     if not message or not message.strip():
         error_result = StreamResult.error(MESSAGE_CANNOT_BE_EMPTY)
@@ -33,24 +34,26 @@ async def stream_chat(chat_message_dto: ChatMessageDTO, session_id: str):
 
     # 响应生成器
     try:
-        # 获取指定模型的RunnableWithMessageHistory实例
-        runnable = ChatLLM.get_runnable(model)
+        # # 获取指定模型的RunnableWithMessageHistory实例
+        # runnable = ChatLLM.get_runnable(model)
 
-        # 获取流式调用
-        chat_stream = runnable.astream(
-            input={"input": message},
-            config={"configurable": {"session_id": session_id}},
-        )
-        # 遍历流式响应
-        async for chunk in chat_stream:
-            if chunk.content:
-                # 使用封装的StreamResult
-                stream_result = StreamResult.chunk(chunk.content)
-                yield stream_result.to_sse_format()
+        # # 获取流式调用
+        # chat_stream = runnable.astream(
+        #     input={"input": message},
+        #     config={"configurable": {"session_id": session_id}},
+        # )
+        # # 遍历流式响应
+        # async for chunk in chat_stream:
+        #     if chunk.content:
+        #         # 使用封装的StreamResult
+        #         stream_result = StreamResult.chunk(chunk.content)
+        #         yield stream_result.to_sse_format()
 
-        # 发送结束标识
-        end_result = StreamResult.end()
-        yield end_result.to_sse_format()
+        # # 发送结束标识
+        # end_result = StreamResult.end()
+        # yield end_result.to_sse_format()
+
+        await TravelChatAgent.travel_plan_or_chat(session_id, message)
 
     except Exception as e:
         log.error(f"流式对话出错: {e}")

@@ -1,8 +1,9 @@
+from urllib import response
 from fastapi import FastAPI, Request
 
 from common.constant.JwtConstant import ACCOUNT_ID
 from common.constant.MessageConstant import JWT_INVALID_OR_EXPIRED, PLEASE_LOGIN
-from common.database import get_db
+from common.database import AsyncSessionLocal
 from common.exception import UnauthorizedException
 from common.log import log
 from common.properties import TOKEN_NAME, WHITELIST_PATHS
@@ -24,10 +25,20 @@ def setup_database_middleware(app: FastAPI):
     async def db_middleware(request: Request, call_next):
         """数据库中间件"""
         try:
-            async for db in get_db():
-                BaseContext.set_db_session(db)
-                response = await call_next(request)
-                return response
+            # 获取数据库会话
+            log.debug("获取数据库会话...")
+            async with AsyncSessionLocal() as session:
+                # 设置数据库会话到上下文
+                BaseContext.set_db_session(session)
+                try:
+                    response = await call_next(request)
+                    log.debug("提交数据库会话...")
+                    await session.commit()
+                    return response
+                except Exception:
+                    log.debug("回滚数据库会话...")
+                    await session.rollback()
+                    raise
         except Exception as e:
             return await handle_exception(request, e)
 
