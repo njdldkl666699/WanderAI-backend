@@ -3,7 +3,7 @@ from contextvars import ContextVar
 from sqlalchemy.ext.asyncio import AsyncSession
 
 db_session_context: ContextVar[AsyncSession] = ContextVar("db_session")
-user_account_id_context: ContextVar[str] = ContextVar("user_account_id")
+account_id_context: ContextVar[str] = ContextVar("account_id")
 
 
 class BaseContext:
@@ -23,12 +23,12 @@ class BaseContext:
 
     # 用户ID相关
     @staticmethod
-    def set_user_account_id(user_account_id: str):
-        user_account_id_context.set(user_account_id)
+    def set_account_id(account_id: str):
+        account_id_context.set(account_id)
 
     @staticmethod
-    def get_user_account_id() -> str | None:
+    def get_account_id() -> str | None:
         try:
-            return user_account_id_context.get()
+            return account_id_context.get()
         except LookupError:
             return None

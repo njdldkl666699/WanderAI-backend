@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 
-from common.constant.JwtConstant import USER_ACCOUNT_ID
+from common.constant.JwtConstant import ACCOUNT_ID
 from common.constant.MessageConstant import JWT_INVALID_OR_EXPIRED, PLEASE_LOGIN
 from common.database import get_db
 from common.exception import UnauthorizedException
@@ -55,11 +55,11 @@ def setup_jwt_middleware(app: FastAPI):
             if not payload:
                 raise UnauthorizedException(JWT_INVALID_OR_EXPIRED)
 
-            id = payload.get(USER_ACCOUNT_ID)
+            id = payload.get(ACCOUNT_ID)
             if not id:
                 raise UnauthorizedException(JWT_INVALID_OR_EXPIRED)
 
-            BaseContext.set_user_account_id(id)
+            BaseContext.set_account_id(id)
             response = await call_next(request)
             return response
         except Exception as e:

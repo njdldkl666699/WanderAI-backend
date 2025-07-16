@@ -6,14 +6,6 @@ class AppException(Exception):
         super().__init__(self.message)
 
 
-class StudentNotFoundException(AppException):
-    """学生未找到异常"""
-
-
-class StudentAlreadyExistsException(AppException):
-    """学生已存在异常"""
-
-
 class UserNotFoundException(AppException):
     """用户未找到异常"""
 

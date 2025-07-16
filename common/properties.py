@@ -2,9 +2,6 @@ import os
 from typing import Set
 
 from dotenv import load_dotenv
-from pydantic import SecretStr
-
-from model.entity import ChatModelEntity
 
 # 配置文件
 load_dotenv()
@@ -52,41 +49,29 @@ WHITELIST_PATHS: Set[str] = {
 
 # 大模型配置
 QWEN_API_KEY = os.getenv("API_KEY", "")
-QWEN_BASE_URL = os.getenv(
-    "QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1"
-)
+QWEN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
-# 聊天模型配置
-DEFAULT_MODE = "qwen-turbo"
-CHAT_MODELS = {
-    "qwen-plus": ChatModelEntity(
-        model="qwen-plus",
-        temperature=0.7,
-        base_url=QWEN_BASE_URL,
-        api_key=SecretStr(QWEN_API_KEY),
-    ),
-    "qwen-turbo": ChatModelEntity(
-        model="qwen-turbo",
-        temperature=0.7,
-        base_url=QWEN_BASE_URL,
-        api_key=SecretStr(QWEN_API_KEY),
-    ),
-    "qwen-max": ChatModelEntity(
-        model="qwen-max",
-        temperature=0.7,
-        base_url=QWEN_BASE_URL,
-        api_key=SecretStr(QWEN_API_KEY),
-    ),
-    "deepseek-r1-0528": ChatModelEntity(
-        model="deepseek-r1-0528",
-        temperature=0.7,
-        base_url=QWEN_BASE_URL,
-        api_key=SecretStr(QWEN_API_KEY),
-    ),
-    "deepseek-v3": ChatModelEntity(
-        model="deepseek-v3",
-        temperature=0.7,
-        base_url=QWEN_BASE_URL,
-        api_key=SecretStr(QWEN_API_KEY),
-    ),
-}
+# 地图API配置
+AMAP_API_KEY = os.getenv("AMAP_API_KEY")
+AMAP_MCP_URL = f"https://mcp.amap.com/mcp?key={AMAP_API_KEY}"
+
+# Agent迭代次数配置
+PLAN_AGENT_MAX_ITERATIONS = 4
+EXECUTOR_AGENT_MAX_ITERATIONS = 1000
+SUMMARY_AGENT_MAX_ITERATIONS = 4
+
+# LLM配置
+HOTSPOT_LLM_NAME = "qwen-plus"
+INTENT_LLM_NAME = "qwen-turbo"
+CHAT_LLM_NAME = "qwen-turbo"
+PLAN_LLM_NAME = "qwen-turbo"
+EXECUTOR_LLM_NAME = "qwen-max"
+SUMMARY_LLM_NAME = "qwen-turbo"
+
+# 温度配置
+HOTSPOT_TEMPERATURE = 0.3
+INTENT_TEMPERATURE = 0.2
+CHAT_TEMPERATURE = 0.7
+PLAN_TEMPERATURE = 0.2
+EXECUTOR_TEMPERATURE = 0.2
+SUMMARY_TEMPERATURE = 0.2

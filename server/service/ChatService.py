@@ -9,29 +9,19 @@ from common.log import log
 from model.dto import ChatMessageDTO
 from model.result import StreamResult
 from model.vo import CreateSessionVO
-from server.llm import ChatLLM
 
 
 def create_session() -> CreateSessionVO:
     """创建一个新的会话"""
     # uuid4生成一个唯一的会话ID
     session_id = str(uuid.uuid4())
-    # 调用ChatLLM的create_session方法创建会话
-    ChatLLM.create_session(session_id)
     # 返回创建会话的VO对象
     return CreateSessionVO(session_id=session_id)
-
-
-def list_models() -> list[str]:
-    """获取可用的模型列表"""
-    # 调用ChatLLM的list_models方法获取所有模型
-    return ChatLLM.list_models()
 
 
 async def stream_chat(chat_message_dto: ChatMessageDTO, session_id: str):
     """异步流式聊天生成器"""
     message = chat_message_dto.message
-    model = chat_message_dto.model
     # 检查会话ID是否存在
     if not model:
         raise ModelNotFoundException(MODEL_CANNOT_BE_EMPTY)

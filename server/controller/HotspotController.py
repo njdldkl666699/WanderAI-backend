@@ -1,25 +1,15 @@
-from fastapi import APIRouter
 from server import app
-from typing import Dict,Any
-from llm.hotspots import prompt,agent_executor,generate_response,out_parser
-import json
 from model.result import Result
-from langchain_core.messages import HumanMessage 
+from common.log import log
+from server.service import HotspotService
 
 
-router = app.APIRouter()
-@router.get("/hotspots")
-async def get_hotspots():
+router = app.APIRouter(prefix="/hotspot")
+
+
+@router.get("/")
+async def get_hotspot():
     """获取热门景点推荐"""
-    response = agent_executor.invoke({
-        "messages":[HumanMessage(content=prompt)]
-    })
-    ai_response=response["messages"][-1].content
-    hotspot_response=out_parser.parse(ai_response)
-    return Result.success(hotspot_response)
-
-    
-
-    
-        
-    
+    log.info("请求获取热门景点推荐")
+    hotspots = await HotspotService.get_hotspots()
+    return Result.success(hotspots)

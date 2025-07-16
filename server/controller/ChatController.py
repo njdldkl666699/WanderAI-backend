@@ -17,19 +17,11 @@ async def create_session():
     return Result.success(create_session_vo)
 
 
-@router.get("/models")
-async def get_models():
-    """获取可用的模型列表"""
-    log.info("请求获取可用模型列表")
-    models = ChatService.list_models()
-    return Result.success(models)
-
-
 @router.post("/{sessionId}")
-async def chat(
+async def travel_plan_or_chat(
     chat_message_dto: ChatMessageDTO, session_id: str = Path(..., alias="sessionId")
 ):
     """发送消息到指定会话"""
-    log.info(f"会话ID: {session_id}, 使用模型: {chat_message_dto.model}")
+    log.info(f"会话ID: {session_id}")
     generator = ChatService.stream_chat(chat_message_dto, session_id)
     return StreamResult.create_streaming_response(generator)

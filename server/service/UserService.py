@@ -1,24 +1,31 @@
-from common.constant.MessageConstant import PASSWORD_ERROR, USER_NOT_FOUND
-from common.exception import PasswordErrorException, UserNotFoundException
-from model.dto import UserLoginDTO, UserRegisterDTO,UserUpdateDTO
-from model.entity import User
-from server.mapper import UserMapper
-from common.context import BaseContext
 import random
 import string
 
-def generate_random_string():
+from common.constant.JwtConstant import ACCOUNT_ID
+from common.constant.MessageConstant import PASSWORD_ERROR, USER_NOT_FOUND
+from common.context import BaseContext
+from common.exception import PasswordErrorException, UserNotFoundException
+from common.util import JwtUtil
+from model.dto import UserLoginDTO, UserRegisterDTO, UserUpdateDTO
+from model.entity import User
+from model.vo import UserLoginVO, UserRegisterVO
+from server.mapper import UserMapper
+
+
+def generate_random_account_id() -> str:
     """生成一个随机的账号ID"""
-    length = random.randint(12, 15)  # 随机长度 12-15
-    chars = string.ascii_letters + string.digits  # 字母 + 数字
-    return ''.join(random.choices(chars, k=length))  # 随机生成
+    length = random.randint(12, 20)  # 随机长度 12-20
+    chars = string.digits  # 数字
+    return "".join(random.choices(chars, k=length))  # 随机生成
 
 
-async def login(userLoginDTO: UserLoginDTO) -> User:
+async def login(userLoginDTO: UserLoginDTO) -> UserLoginVO:
+    """用户登录"""
     account_id = userLoginDTO.account_id
     password = userLoginDTO.password
 
-    user: User | None = await UserMapper.get_user_by_account_id(account_id)
+    user = await UserMapper.get_user_by_account_id(account_id)
+    # 检查用户是否存在
     if not user:
         raise UserNotFoundException(USER_NOT_FOUND)
 
@@ -26,40 +33,43 @@ async def login(userLoginDTO: UserLoginDTO) -> User:
     if user.password != password:
         raise PasswordErrorException(PASSWORD_ERROR)
 
-    return user
+    # 登录成功后，生成jwt令牌
+    token = JwtUtil.create_JWT({ACCOUNT_ID: user.account_id})
+    userLoginVO = UserLoginVO(token=token, nickname=user.nickname)
 
-async def register(userRegisterDTO: UserRegisterDTO) -> User:
+    return userLoginVO
+
+
+async def register(userRegisterDTO: UserRegisterDTO) -> UserRegisterVO:
+    """用户注册"""
     nickname = userRegisterDTO.nickname
     password = userRegisterDTO.password
 
-
-    # 检查用户是否已存在
     while True:
-        account_id = generate_random_string()
-        existing_user: User | None = await UserMapper.get_user_by_account_id(account_id)
+        # 随机生成账号
+        account_id = generate_random_account_id()
+
+        existing_user = await UserMapper.get_user_by_account_id(account_id)
         if existing_user:
-            raise UserNotFoundException(f"用户 {nickname} 已存在")
-        else:
-            # 创建新用户
-            new_user = User(nickname=nickname, account_id=account_id, password=password)
-            await UserMapper.create_user(new_user)
-            return new_user
+            # 用户存在，重新创建账号
+            continue
 
-async def update(userUpdateDTO: UserUpdateDTO) -> User:
+        # 将新用户插入数据库中
+        new_user = User(nickname=nickname, account_id=account_id, password=password)
+        await UserMapper.create_user(new_user)
+
+        # 创建VO
+        userRegisterVO = UserRegisterVO(account_id=account_id)
+        return userRegisterVO
+
+
+async def update(userUpdateDTO: UserUpdateDTO) -> None:
     """更新用户昵称"""
-    new_nickname = userUpdateDTO.newNickname
-    temp_account_id = BaseContext.get_user_account_id()
-    if not temp_account_id:
-        raise UserNotFoundException(USER_NOT_FOUND)
-    user: User | None = await UserMapper.get_user_by_account_id(temp_account_id)
-    if not user:
-        raise UserNotFoundException(USER_NOT_FOUND)
-    user.nickname = new_nickname
-    await UserMapper.update_user_nickname(user.account_id, new_nickname)
-    return user
+    new_nickname = userUpdateDTO.new_nickname
 
-async def list() -> list[User]:
-    userList = await UserMapper.list()
-    if not userList:
-        return []
-    return userList
+    # 获取账号
+    account_id = BaseContext.get_account_id()
+    if not account_id:
+        raise UserNotFoundException(USER_NOT_FOUND)
+
+    await UserMapper.update_nickname_by_account_id(account_id, new_nickname)

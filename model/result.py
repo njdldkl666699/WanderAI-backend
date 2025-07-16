@@ -20,8 +20,8 @@ class Result(BaseModel):
 class StreamResult(BaseModel):
     """流式响应结果封装"""
 
-    type: Literal["chunk", "end", "error"]
-    content: str = ""
+    type: Literal["chat", "plan", "end", "error", "all"] = Field(description="数据类型")
+    content: str = Field(description="内容")
 
     def to_sse_format(self) -> str:
         """转换为 Server-Sent Events 格式"""
@@ -43,9 +43,19 @@ class StreamResult(BaseModel):
         )
 
     @staticmethod
-    def chunk(content: str) -> "StreamResult":
-        """创建内容块"""
-        return StreamResult(type="chunk", content=content)
+    def chat(content: str) -> "StreamResult":
+        """创建聊天消息"""
+        return StreamResult(type="chat", content=content)
+
+    @staticmethod
+    def plan(content: str) -> "StreamResult":
+        """创建计划消息"""
+        return StreamResult(type="plan", content=content)
+
+    @staticmethod
+    def all(content: str) -> "StreamResult":
+        """创建计划最终消息"""
+        return StreamResult(type="all", content=content)
 
     @staticmethod
     def end() -> "StreamResult":

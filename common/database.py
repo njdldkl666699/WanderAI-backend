@@ -3,6 +3,7 @@ from typing import AsyncGenerator
 
 from common.properties import *
 from model.schema import Base
+from common.log import log
 
 # 创建异步引擎
 engine = create_async_engine(
