@@ -27,14 +27,6 @@ class HistoryTitleModel(Base):
     title = Column(VARCHAR(255), nullable=False)
     session_id = Column(TEXT, nullable=False)
 
-class MessageStoreModel(Base):
-    """历史消息存储模型"""
-    __tablename__ = "message_store"
-
-    id = Column(INT, primary_key=True, autoincrement=True)
-    session_id = Column(TEXT, nullable=False)
-    message = Column(TEXT, nullable=False)
-
 class SuggestionModel(Base):
     """用户建议模型"""
     __tablename__ = "suggestion"

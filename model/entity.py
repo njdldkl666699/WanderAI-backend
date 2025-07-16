@@ -28,15 +28,6 @@ class HistoryTitle(BaseModel):
     class Config:
         from_attributes = True  # 允许从ORM对象创建
 
-class MessageStore(BaseModel):
-    """历史消息存储模型"""
-    id: int = Field(description="消息ID(单纯作为主键)")
-    session_id: str = Field(description="会话ID")
-    message: str = Field(description="消息内容")
-
-    class Config:
-        from_attributes = True  # 允许从ORM对象创建
-
 class Suggestion(BaseModel):
     """用户建议模型"""
     id: int = Field(description="建议ID(单纯作为主键)")
