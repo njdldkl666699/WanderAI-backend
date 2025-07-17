@@ -6,7 +6,7 @@ from common.constant.MessageConstant import PASSWORD_ERROR, USER_NOT_FOUND
 from common.context import BaseContext
 from common.exception import PasswordErrorException, UserNotFoundException
 from common.util import JwtUtil
-from model.dto import UserLoginDTO, UserRegisterDTO, UserUpdateDTO
+from model.dto import UserLoginDTO, UserRegisterDTO
 from model.entity import User
 from model.vo import UserLoginVO, UserRegisterVO
 from server.mapper import UserMapper
@@ -14,7 +14,7 @@ from server.mapper import UserMapper
 
 def generate_random_account_id() -> str:
     """生成一个随机的账号ID"""
-    length = random.randint(12, 20)  # 随机长度 12-20
+    length = random.randint(6, 10)  # 随机长度 6-10
     chars = string.digits  # 数字
     return "".join(random.choices(chars, k=length))  # 随机生成
 

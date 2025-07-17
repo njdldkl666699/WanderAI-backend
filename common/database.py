@@ -32,8 +32,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             yield session
             log.info("提交数据库事务...")
             await session.commit()
-        except Exception as e:
-            log.warning("回滚数据库事务...", e)
+        except Exception:
+            log.warning("回滚数据库事务...")
             await session.rollback()
             raise
         finally:

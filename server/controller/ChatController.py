@@ -23,14 +23,5 @@ async def travel_plan_or_chat(
 ):
     """发送消息到指定会话"""
     log.info(f"会话ID: {session_id}")
-    # session_id_exists = await ChatService.check_session_id(session_id)
-    # if not session_id_exists:
-    #     log.warning("")
-    #     return StreamResult.create_streaming_response(create_error_streaming_result())
     generator = ChatService.travel_plan_or_chat(chat_message_dto, session_id)
     return StreamResult.create_streaming_response(generator)
-
-
-async def create_error_streaming_result():
-    result = StreamResult.error("会话不存在")
-    yield result.to_sse_format()

@@ -28,9 +28,7 @@ class ColoredFormatter(logging.Formatter):
 
         # 为副本添加颜色
         log_color = self.COLORS.get(record_copy.levelname, self.COLORS["RESET"])
-        record_copy.levelname = (
-            f"{log_color}{record_copy.levelname}{self.COLORS['RESET']}"
-        )
+        record_copy.levelname = f"{log_color}{record_copy.levelname}{self.COLORS['RESET']}"
 
         # 使用父类格式化副本
         return super().format(record_copy)
@@ -40,10 +38,7 @@ def setup_logging():
     """统一配置所有日志"""
     # 配置根日志记录器
     root_logger = logging.getLogger()
-    if DEBUG:
-        root_logger.setLevel(logging.DEBUG)
-    else:
-        root_logger.setLevel(logging.INFO)
+    root_logger.setLevel(LEVEL)
 
     # 清除现有处理器
     root_logger.handlers.clear()
@@ -89,7 +84,7 @@ def take_over_logging():
 
     # 配置 SQLAlchemy 日志
     sqlalchemy_logger = logging.getLogger("sqlalchemy")
-    if DEBUG:
+    if LEVEL == "DEBUG":
         sqlalchemy_logger.setLevel(logging.INFO)  # 显示SQL语句
     else:
         sqlalchemy_logger.setLevel(logging.WARNING)
@@ -97,9 +92,14 @@ def take_over_logging():
     # 清除 SQLAlchemy 的默认处理器
     sqlalchemy_logger.propagate = True
 
-    # 配置其他常用库的日志
-    logging.getLogger("fastapi").propagate = True
-    logging.getLogger("asyncio").setLevel(logging.WARNING)
+    # 配置特定库的日志级别为 INFO，除非设定为最低等级
+    if LEVEL != "NOTSET":
+        logging.getLogger("openai._base_client").setLevel(logging.INFO)
+        logging.getLogger("httpcore.http11").setLevel(logging.INFO)
+        logging.getLogger("urllib3.connectionpool").setLevel(logging.INFO)
+        logging.getLogger("httpcore.connection").setLevel(logging.INFO)
+        logging.getLogger("mcp.client.streamable_http").setLevel(logging.INFO)
+        logging.getLogger("langsmith.client").setLevel(logging.INFO)
 
 
 def create_console_handler():
@@ -130,9 +130,7 @@ def create_file_handler():
     daily_filename = f"{FILE_PREFIX}.{current_date}.log"
 
     # 使用普通的 FileHandler，每天程序启动时自动创建新文件
-    file_handler = logging.FileHandler(
-        filename=daily_filename, mode="a", encoding="utf-8"
-    )
+    file_handler = logging.FileHandler(filename=daily_filename, mode="a", encoding="utf-8")
     file_handler.setFormatter(file_formatter)
 
     return file_handler

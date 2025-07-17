@@ -1,3 +1,5 @@
+from langchain_core.messages import AIMessage, HumanMessage
+
 from common.constant.MessageConstant import MESSAGE_LIST_IS_EMPTY, PLEASE_LOGIN, SESSION_NOT_FOUND
 from common.context import BaseContext
 from common.exception import (
@@ -5,43 +7,23 @@ from common.exception import (
     SessionNotFoundException,
     UserNotFoundException,
 )
-from model.entity import HistoryTitle
-from model.vo import HistoryTitleVO,HistoryMessageVO
+from model.entity import UserHistory
+from model.vo import HistoryListVO, HistoryMessageVO, HistoryTitleVO
 from server.agent.interface import TitleGenerator, TravelChatAgent
-from server.mapper import HistoryTitleMapper, UserHistoryMapper
-from langchain_core.messages import BaseMessage
+from server.mapper import UserHistoryMapper
 
 
-async def get_history_title_by_account_id() -> list[HistoryTitle] | None:
+async def list_history() -> list[HistoryListVO] | None:
     """获取历史标题列表"""
     account_id = BaseContext.get_account_id()
     if not account_id:
         raise UserNotFoundException(PLEASE_LOGIN)
 
-    # 获取当前用户的历史会话id
-    user_sessions = await UserHistoryMapper.get_session_ids_by_account_id(account_id)
-    if not user_sessions:
-        return []
-
-    return await HistoryTitleMapper.get_titles_by_session_ids(user_sessions)
-
-
-async def get_history_chatContent_by_session_id(session_id: str) -> list[HistoryMessageVO] | None:
-    """获取历史聊天内容"""
-    async with TravelChatAgent.create_travel_plan_graph() as graph:
-        messages = await TravelChatAgent.get_history_messages(graph, session_id)
-    if not messages:
-        raise MessageListEmptyException(MESSAGE_LIST_IS_EMPTY)
-
-    # 将消息转换为HistoryMessageVO
-    history_messages = [
-        HistoryMessageVO(
-            type=message.type,
-            message=message.content,
-        )
-        for message in messages
+    user_history_list = await UserHistoryMapper.list_by_account_id(account_id)
+    return [
+        HistoryListVO(title=user_history.title, session_id=user_history.session_id)
+        for user_history in user_history_list
     ]
-    return history_messages
 
 
 async def create_history_title(session_id: str) -> HistoryTitleVO:
@@ -50,9 +32,10 @@ async def create_history_title(session_id: str) -> HistoryTitleVO:
     if not account_id:
         raise UserNotFoundException(PLEASE_LOGIN)
 
-    # 获取当前用户的历史会话id
-    user_sessions = await UserHistoryMapper.get_session_ids_by_account_id(account_id)
-    if not user_sessions or session_id not in user_sessions:
+    # 根据会话id获取当前历史记录
+    user_history_list = await UserHistoryMapper.get_by_session_account(session_id, account_id)
+    if not user_history_list:
+        # 如果没有找到对应的会话id，抛出异常
         raise SessionNotFoundException(SESSION_NOT_FOUND)
 
     messages = None
@@ -66,12 +49,35 @@ async def create_history_title(session_id: str) -> HistoryTitleVO:
     # 调用AI模型生成标题
     title = TitleGenerator.generate_title(messages)
 
-    # 插入到数据库
-    history_title = HistoryTitle(
-        id=None,
+    history_db = user_history_list[0]
+    history_new = UserHistory(
+        id=history_db.id,
+        account_id=history_db.account_id,
         session_id=session_id,
         title=title,
     )
-    await HistoryTitleMapper.insert_history_title(history_title)
+    # 更新数据库
+    await UserHistoryMapper.update_user_history(history_new)
 
     return HistoryTitleVO(title=title)
+
+
+async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessageVO] | None:
+    """获取历史聊天内容"""
+    messages = None
+    async for graph in TravelChatAgent.create_travel_plan_graph():
+        messages = await TravelChatAgent.get_history_messages(graph, session_id)
+    if not messages:
+        raise MessageListEmptyException(MESSAGE_LIST_IS_EMPTY)
+
+    # 将消息转换为HistoryMessageVO
+    history_messages: list[HistoryMessageVO] = []
+    for message in messages:
+        if isinstance(message, HumanMessage) and isinstance(message.content, str):
+            history_messages.append(HistoryMessageVO(type="human", message=message.content))
+        if isinstance(message, AIMessage) and isinstance(message.content, str):
+            history_messages.append(HistoryMessageVO(type="chat", message=message.content))
+        if isinstance(message, AIMessage) and isinstance(message.content, list):
+            history_messages.append(HistoryMessageVO(type="plan", message=message.content[0]))
+
+    return history_messages

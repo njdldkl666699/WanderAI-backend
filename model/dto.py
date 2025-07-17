@@ -18,15 +18,13 @@ class UserLoginDTO(BaseModel):
     password: str = Field(description="用户密码")
 
 
-class UserUpdateDTO(BaseModel):
-    """用户修改昵称DTO"""
-
-    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
-
-    new_nickname: str = Field(description="用户新昵称")
-
-
 class ChatMessageDTO(BaseModel):
-    """用户发送的最新消息"""
+    """用户发送的消息DTO"""
 
     message: str = Field(description="用户发送的消息内容")
+
+
+class SuggestionDTO(BaseModel):
+    """用户反馈信息DTO"""
+
+    message: str = Field(default="", description="用户反馈的信息")

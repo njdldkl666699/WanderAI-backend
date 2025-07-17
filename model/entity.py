@@ -13,21 +13,12 @@ class User(BaseModel):
 
 
 class UserHistory(BaseModel):
-    """某个用户历史会话模型"""
+    """用户历史会话模型"""
 
+    id: int | None = Field(default=None, description="主键")
     account_id: str = Field(description="用户账号ID")
     session_id: str = Field(description="会话ID")
-
-    class Config:
-        from_attributes = True
-
-
-class HistoryTitle(BaseModel):
-    """历史会话列表模型"""
-
-    id: int | None = Field(None, description="主键ID")
-    title: str = Field(description="会话标题")
-    session_id: str = Field(description="会话ID")
+    title: str = Field(description="历史会话标题")
 
     class Config:
         from_attributes = True

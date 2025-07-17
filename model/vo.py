@@ -1,12 +1,6 @@
+from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
-
-
-class UserLoginVO(BaseModel):
-    """用户登录VO"""
-
-    token: str = Field(description="用户令牌")
-    nickname: str = Field(description="用户昵称")
 
 
 class UserRegisterVO(BaseModel):
@@ -18,6 +12,13 @@ class UserRegisterVO(BaseModel):
     account_id: str = Field(description="用户账号ID")
 
 
+class UserLoginVO(BaseModel):
+    """用户登录VO"""
+
+    token: str = Field(description="用户令牌")
+    nickname: str = Field(description="用户昵称")
+
+
 class CreateSessionVO(BaseModel):
     """创建会话VO"""
 
@@ -26,10 +27,17 @@ class CreateSessionVO(BaseModel):
     session_id: str = Field(description="会话ID")
 
 
-class HistoryTitleVO(BaseModel):
-    """历史会话标题VO"""
+class HistoryListVO(BaseModel):
+    """历史会话列表VO"""
 
     model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+
+    title: str = Field(description="会话标题")
+    session_id: str = Field(description="会话id")
+
+
+class HistoryTitleVO(BaseModel):
+    """会话标题VO"""
 
     title: str = Field(description="会话标题")
 
@@ -38,7 +46,7 @@ class HistoryMessageVO(BaseModel):
     """历史消息VO"""
 
     type: str = Field(description="消息类型")
-    message: str | list[dict]= Field(description="消息内容")
+    message: str | dict = Field(description="消息内容")
 
 
 class HotspotVO(BaseModel):

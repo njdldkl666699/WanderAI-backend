@@ -1,12 +1,12 @@
 from common.constant.MessageConstant import PLEASE_LOGIN
 from common.context import BaseContext
 from common.exception import UserNotFoundException
-from model.dto import ChatMessageDTO
+from model.dto import SuggestionDTO
 from model.entity import Suggestion
 from server.mapper import SuggestionMapper
 
 
-async def create_suggestion(suggestion: ChatMessageDTO):
+async def create_suggestion(suggestion: SuggestionDTO):
     """创建一个新的建议"""
     account_id = BaseContext.get_account_id()
     if not account_id:

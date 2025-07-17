@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
 from common.log import log
-from model.dto import UserLoginDTO, UserRegisterDTO, UserUpdateDTO
+from model.dto import UserLoginDTO, UserRegisterDTO
 from model.result import Result
 from server.service import UserService
 

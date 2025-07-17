@@ -26,22 +26,13 @@ async def create_session() -> CreateSessionVO:
         raise UserNotFoundException(PLEASE_LOGIN)
 
     # 生成session_id放到数据库
-    new_user_history = UserHistory(account_id=account_id, session_id=session_id)
+    new_user_history = UserHistory(
+        id=None, account_id=account_id, session_id=session_id, title="新建对话"
+    )
     await UserHistoryMapper.create_user_history(new_user_history)
 
     # 返回创建会话的VO对象
     return CreateSessionVO(session_id=session_id)
-
-
-async def check_session_id(session_id: str) -> bool:
-    user_sessions: list[str] | None = await UserHistoryMapper.get_session_ids_by_account_id(
-        session_id
-    )
-    # 检查会话ID是否存在
-    if not user_sessions or session_id not in user_sessions:
-        return False
-
-    return True
 
 
 async def travel_plan_or_chat(
@@ -72,8 +63,9 @@ async def travel_plan_or_chat(
                 subgraphs=True,
             ):
                 (namespace, mode, data) = chunk
-                # parent_name: str = namespace[0]
+
                 parent_name = ""
+                # 获取当前节点的父节点名称
                 if namespace and len(namespace) != 0:
                     parent_name = namespace[0]
 
@@ -82,7 +74,7 @@ async def travel_plan_or_chat(
                     message_dict: dict[str, Any] = data  # type: ignore
                     key = list(message_dict.keys())[0]
                     # current_state: TravelPlanState = message_dict[key]
-                    log.info(f"\n{"#"*20} 状态更新: {namespace} {key} {"#"*20}\n")
+                    log.info(f"\n{"#"*20} 状态更新: {parent_name} {key} {"#"*20}\n")
 
                     # 映射节点到处理消息
                     processing_message = map_node_to_processing_message(parent_name, key)
@@ -111,8 +103,10 @@ async def travel_plan_or_chat(
                 final_output: dict[str, Any] | str = final_state.values.get("final_output", "")
 
                 if isinstance(final_output, str):
+                    # chat输出
                     log.info(f"最终输出：{final_output}")
                 if isinstance(final_output, dict):
+                    # 旅行规划输出
                     log.info(f"最终输出：{final_output.keys()}")
 
                 all_result = StreamResult.all(final_output)
