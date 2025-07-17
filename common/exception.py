@@ -32,3 +32,7 @@ class SessionNotFoundException(AppException):
 
 class MessageCannotBeEmptyException(AppException):
     """消息内容不能为空异常"""
+
+
+class MessageListEmptyException(AppException):
+    """消息列表为空异常"""

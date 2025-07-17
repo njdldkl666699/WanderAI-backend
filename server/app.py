@@ -4,7 +4,13 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from common.database import init_db
-from server.controller import ChatController, HotspotController, UserController
+from server.controller import (
+    ChatController,
+    HistoryController,
+    HotspotController,
+    SuggestionController,
+    UserController,
+)
 from server.handler import setup_exception_handler
 from server.interceptor import setup_middlewares
 
@@ -37,5 +43,7 @@ api_router = APIRouter(prefix="/api")
 api_router.include_router(UserController.router)
 api_router.include_router(ChatController.router)
 api_router.include_router(HotspotController.router)
+api_router.include_router(HistoryController.router)
+api_router.include_router(SuggestionController.router)
 
 app.include_router(api_router)

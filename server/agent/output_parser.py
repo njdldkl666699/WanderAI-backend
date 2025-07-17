@@ -1,4 +1,4 @@
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 
 from server.agent.model import (
     ExecutorResult,
@@ -9,6 +9,8 @@ from server.agent.model import (
 )
 
 hotspot_parser = JsonOutputParser(pydantic_object=HotspotsResult)
+
+title_parser = StrOutputParser()
 
 intent_parser = JsonOutputParser(pydantic_object=IntentResult)
 

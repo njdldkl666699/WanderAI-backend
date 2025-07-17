@@ -10,6 +10,13 @@ hotspot_llm = ChatOpenAI(
     temperature=HOTSPOT_TEMPERATURE,
 )
 
+title_llm = ChatOpenAI(
+    model=TITLE_LLM_NAME,
+    api_key=SecretStr(QWEN_API_KEY),
+    base_url=QWEN_BASE_URL,
+    temperature=TITLE_TEMPERATURE,
+)
+
 intent_llm = ChatOpenAI(
     model=INTENT_LLM_NAME,
     api_key=SecretStr(QWEN_API_KEY),

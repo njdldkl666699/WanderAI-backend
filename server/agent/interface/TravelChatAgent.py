@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+from langchain_core.messages import BaseMessage
 from langgraph.checkpoint.mysql.asyncmy import AsyncMySaver
 from langgraph.graph.state import CompiledStateGraph
 
@@ -18,14 +19,14 @@ async def create_travel_plan_graph():
 
 
 async def get_or_create_state(
-    app: CompiledStateGraph[TravelPlanState, TravelPlanState, TravelPlanState],
+    graph: CompiledStateGraph[TravelPlanState, TravelPlanState, TravelPlanState],
     user_input: str,
     thread_id: str,
 ) -> TravelPlanState:
     """获取或创建初始状态，保持历史记忆"""
 
     # 获取最新的检查点状态
-    state_snapshot = await app.aget_state({"configurable": {"thread_id": thread_id}})
+    state_snapshot = await graph.aget_state({"configurable": {"thread_id": thread_id}})
 
     if state_snapshot and state_snapshot.values:
         # 如果存在历史状态，更新用户输入
@@ -45,3 +46,14 @@ async def get_or_create_state(
             "final_output": "",
             "messages": [],
         }
+
+
+async def get_history_messages(
+    graph: CompiledStateGraph[TravelPlanState, TravelPlanState, TravelPlanState], thread_id: str
+) -> list[BaseMessage]:
+    """获取历史消息记录"""
+    state_snapshot = await graph.aget_state({"configurable": {"thread_id": thread_id}})
+    if state_snapshot and state_snapshot.values:
+        return state_snapshot.values.get("messages", [])
+
+    return []

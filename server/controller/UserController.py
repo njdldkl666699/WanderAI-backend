@@ -13,7 +13,6 @@ async def login(userLoginDTO: UserLoginDTO):
     """用户登录"""
     log.info(f"用户登录: {userLoginDTO.account_id}")
     userLoginVO = await UserService.login(userLoginDTO)
-
     return Result.success(userLoginVO)
 
 
@@ -22,7 +21,6 @@ async def register(userRegisterDTO: UserRegisterDTO):
     """用户注册"""
     log.info(f"用户注册: {userRegisterDTO.nickname}")
     userRegisterVO = await UserService.register(userRegisterDTO)
-
     return Result.success(userRegisterVO)
 
 

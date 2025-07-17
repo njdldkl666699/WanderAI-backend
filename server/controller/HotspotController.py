@@ -4,10 +4,10 @@ from common.log import log
 from server.service import HotspotService
 
 
-router = app.APIRouter()
+router = app.APIRouter(prefix="/hotspot")
 
 
-@router.get("/hotspot")
+@router.get("/")
 async def get_hotspot():
     """获取热门景点推荐"""
     log.info("请求获取热门景点推荐")

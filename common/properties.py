@@ -26,9 +26,7 @@ FILE_PREFIX = os.getenv("FILE_PREFIX", "./logs/app")
 ROLL_WHEN = os.getenv("ROLL_WHEN", "midnight")  # 日志切割时间
 INTERVAL = int(os.getenv("INTERVAL", "1"))  # 切割间隔
 FILE_SUFFIX = os.getenv("FILE_SUFFIX", "%Y-%m-%d.log")  # 日志文件后缀
-SUFFIX_REGEX = os.getenv(
-    "SUFFIX_REGEX", r"^\d{4}-\d{2}-\d{2}.log$"
-)  # 日志文件名匹配正则
+SUFFIX_REGEX = os.getenv("SUFFIX_REGEX", r"^\d{4}-\d{2}-\d{2}.log$")  # 日志文件名匹配正则
 
 # JWT配置
 SECRET_KEY = os.getenv("SECRET_KEY", "")
@@ -63,6 +61,7 @@ SUMMARY_AGENT_MAX_ITERATIONS = 4
 
 # LLM配置
 HOTSPOT_LLM_NAME = "qwen-plus"
+TITLE_LLM_NAME = "qwen-turbo"
 INTENT_LLM_NAME = "qwen-turbo"
 CHAT_LLM_NAME = "qwen-turbo"
 PLAN_LLM_NAME = "qwen-turbo"
@@ -71,6 +70,7 @@ SUMMARY_LLM_NAME = "qwen-turbo"
 
 # 温度配置
 HOTSPOT_TEMPERATURE = 0.3
+TITLE_TEMPERATURE = 0.7
 INTENT_TEMPERATURE = 0.2
 CHAT_TEMPERATURE = 0.7
 PLAN_TEMPERATURE = 0.2

@@ -37,6 +37,27 @@ hotspot_prompt_template = ChatPromptTemplate.from_template(
 )
 
 
+# 聊天标题AI提示词模板
+title_prompt_template = ChatPromptTemplate.from_template(
+    """
+请根据以下对话内容，生成一个简洁、准确的标题（不超过15字），要求：
+1. 提取对话的核心主题或关键事件
+2. 避免泛泛而谈（如"用户咨询"），需体现具体信息
+3. 若对话涉及多主题，优先概括占比最高的部分
+
+示例参考：
+1. 2024年产品功能升级计划讨论
+2. 客服投诉处理：空调保修期查询
+3. 用户反馈：APP登录异常问题
+
+请对以下内容生成标题：
+{messages}
+
+请生成标题，不要输出其他内容，只输出标题文本，不需要引号或其他符号。
+"""
+)
+
+
 # 意图识别提示词模板
 intent_prompt_template = ChatPromptTemplate.from_template(
     """

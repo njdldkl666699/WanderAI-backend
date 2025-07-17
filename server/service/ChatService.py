@@ -1,26 +1,19 @@
-import json
-from typing import Any
 import uuid
+from typing import Any
 
-from common.constant.MessageConstant import (
-    MESSAGE_CANNOT_BE_EMPTY,
-    MODEL_CANNOT_BE_EMPTY,
-    SESSION_NOT_FOUND,
-)
-from common.exception import (
-    MessageCannotBeEmptyException,
-    ModelNotFoundException,
-    SessionNotFoundException,
-)
+from langchain_core.messages.ai import AIMessageChunk
+from langchain_core.runnables.config import RunnableConfig
+
+from common.constant.MessageConstant import MESSAGE_CANNOT_BE_EMPTY, PLEASE_LOGIN
+from common.context import BaseContext
+from common.exception import MessageCannotBeEmptyException, UserNotFoundException
 from common.log import log
 from model.dto import ChatMessageDTO
+from model.entity import UserHistory
 from model.result import StreamResult
 from model.vo import CreateSessionVO
 from server.agent.interface import TravelChatAgent
-from langchain_core.runnables.config import RunnableConfig
-from langchain_core.messages.ai import AIMessageChunk
-
-from server.agent.state import TravelPlanState
+from server.mapper import UserHistoryMapper
 
 
 async def create_session() -> CreateSessionVO:
@@ -30,13 +23,14 @@ async def create_session() -> CreateSessionVO:
     # 将新session_id存储到数据库中
     account_id = BaseContext.get_account_id()
     if not account_id:
-        raise ValueError("Account ID is Null")
-    else:
-        new_user_history = UserHistory(account_id=account_id, session_id=session_id)
-        await UserHistoryMapper.create_user_history(new_user_history)
+        raise UserNotFoundException(PLEASE_LOGIN)
+
+    # 生成session_id放到数据库
+    new_user_history = UserHistory(account_id=account_id, session_id=session_id)
+    await UserHistoryMapper.create_user_history(new_user_history)
 
     # 返回创建会话的VO对象
-    return CreateSessionVO(session_id=session_id)  # 生成session_id放到数据库
+    return CreateSessionVO(session_id=session_id)
 
 
 async def travel_plan_or_chat(chat_message_dto: ChatMessageDTO, session_id: str):
@@ -52,17 +46,17 @@ async def travel_plan_or_chat(chat_message_dto: ChatMessageDTO, session_id: str)
             raise MessageCannotBeEmptyException(MESSAGE_CANNOT_BE_EMPTY)
 
         # 创建旅行计划图
-        async with TravelChatAgent.create_travel_plan_graph() as app:
+        async with TravelChatAgent.create_travel_plan_graph() as graph:
             # 获取初始状态
             initial_state = await TravelChatAgent.get_or_create_state(
-                app, message, thread_id=session_id
+                graph, message, thread_id=session_id
             )
 
             # 初始化当前节点
             current_node: str = ""
 
             # 使用updates和messages混合流式处理模式
-            async for chunk in app.astream(
+            async for chunk in graph.astream(
                 initial_state,
                 config=RunnableConfig(configurable={"thread_id": session_id}),
                 stream_mode=["updates", "messages"],
@@ -99,7 +93,7 @@ async def travel_plan_or_chat(chat_message_dto: ChatMessageDTO, session_id: str)
                         yield chat_result.to_sse_format()
 
             # 最终状态
-            final_state = await app.aget_state({"configurable": {"thread_id": session_id}})
+            final_state = await graph.aget_state({"configurable": {"thread_id": session_id}})
 
             if final_state and final_state.values:
                 final_output_dict: dict[str, Any] = final_state.values.get("final_output", "")
