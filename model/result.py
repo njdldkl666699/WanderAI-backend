@@ -48,12 +48,12 @@ class StreamResult(BaseModel):
         return StreamResult(type="chat", content=content)
 
     @staticmethod
-    def plan(content: dict[str, Any]) -> "StreamResult":
+    def plan(content: str) -> "StreamResult":
         """创建计划消息"""
         return StreamResult(type="plan", content=content)
 
     @staticmethod
-    def all(content: dict[str, Any]) -> "StreamResult":
+    def all(content: Any) -> "StreamResult":
         """创建计划最终消息"""
         return StreamResult(type="all", content=content)
 

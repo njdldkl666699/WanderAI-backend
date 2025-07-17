@@ -10,6 +10,7 @@ if __name__ == "__main__":
     # 启动服务器，禁用 uvicorn 的默认日志配置
     uvicorn.run(
         app,
+        host="0.0.0.0",
         port=8080,
         reload=False,  # 调试时禁用热重载
         log_config=None,  # 禁用 uvicorn 默认日志配置

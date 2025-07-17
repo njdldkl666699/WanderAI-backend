@@ -33,13 +33,11 @@ async def create_history_title(session_id: str) -> HistoryTitleVO:
 
     # 获取当前用户的历史会话id
     user_sessions = await UserHistoryMapper.get_session_ids_by_account_id(account_id)
-    if not user_sessions:
+    if not user_sessions or session_id not in user_sessions:
         raise SessionNotFoundException(SESSION_NOT_FOUND)
 
-    if session_id not in user_sessions:
-        raise SessionNotFoundException(SESSION_NOT_FOUND)
-
-    async with TravelChatAgent.create_travel_plan_graph() as graph:
+    messages = None
+    async for graph in TravelChatAgent.create_travel_plan_graph():
         # 获取当前会话id的所有消息
         messages = await TravelChatAgent.get_history_messages(graph, session_id)
 

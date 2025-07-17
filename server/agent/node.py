@@ -32,6 +32,7 @@ from server.agent.tool import load_amap_mcp_tools, search_tool
 def intent_recognition_node(state: TravelPlanState) -> TravelPlanState:
     """意图识别节点"""
     try:
+        state["messages"].append(HumanMessage(state["user_input"]))
         response = intent_chain.invoke({"user_input": state["user_input"]})
         intent_result = IntentResult(**response)
         state["intent_type"] = intent_result.type
@@ -48,8 +49,6 @@ def chat_node(state: TravelPlanState) -> TravelPlanState:
     """普通聊天Agent节点"""
 
     messages = state["messages"]
-    current_message = HumanMessage(state["user_input"])
-    messages.append(current_message)
 
     response = chat_agent.invoke({"messages": messages})
     ai_response = response["messages"][-1].content
@@ -169,6 +168,9 @@ def summary_node(state: TravelPlanState) -> TravelPlanState:
         # 生成最终输出
         final_output = generate_final_output(state)
         state["final_output"] = final_output.model_dump()
+
+        # 更新状态，将消息追加到 messages 中
+        state["messages"].append(AIMessage(content=[final_output.model_dump()]))
     except Exception as e:
         # 生成默认总结
         log.warning("总结Agent发生错误: ", e, exc_info=e, stack_info=True)

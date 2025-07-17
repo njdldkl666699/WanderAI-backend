@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from common.log import log
 from model.dto import UserLoginDTO, UserRegisterDTO, UserUpdateDTO
@@ -25,8 +25,8 @@ async def register(userRegisterDTO: UserRegisterDTO):
 
 
 @router.put("/nickname")
-async def update_user(userUpdateDTO: UserUpdateDTO):
+async def update_user(new_nickname: str = Query(alias="newNickname")):
     """修改昵称"""
-    log.info(f"更新用户昵称: {userUpdateDTO.new_nickname}")
-    await UserService.update(userUpdateDTO)
+    log.info(f"更新用户昵称: {new_nickname}")
+    await UserService.update(new_nickname)
     return Result.success()

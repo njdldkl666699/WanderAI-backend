@@ -1,5 +1,5 @@
 import uuid
-from typing import Any
+from typing import Any, AsyncGenerator
 
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.runnables.config import RunnableConfig
@@ -33,20 +33,29 @@ async def create_session() -> CreateSessionVO:
     return CreateSessionVO(session_id=session_id)
 
 
-async def travel_plan_or_chat(chat_message_dto: ChatMessageDTO, session_id: str):
+async def check_session_id(session_id: str) -> bool:
+    user_sessions: list[str] | None = await UserHistoryMapper.get_session_ids_by_account_id(
+        session_id
+    )
+    # 检查会话ID是否存在
+    if not user_sessions or session_id not in user_sessions:
+        return False
+
+    return True
+
+
+async def travel_plan_or_chat(
+    chat_message_dto: ChatMessageDTO, session_id: str
+) -> AsyncGenerator[str, None]:
     """异步流式聊天生成器"""
     try:
         message = chat_message_dto.message
-        # user_sessions: list[str] = UserHistoryMapper.get_session_id_by_account_id(session_id)
-        # # 检查会话ID是否存在
-        # if session_id not in user_sessions:
-        #     raise SessionNotFoundException(SESSION_NOT_FOUND)
         # 检查消息内容是否为空
         if not message or not message.strip():
             raise MessageCannotBeEmptyException(MESSAGE_CANNOT_BE_EMPTY)
 
         # 创建旅行计划图
-        async with TravelChatAgent.create_travel_plan_graph() as graph:
+        async for graph in TravelChatAgent.create_travel_plan_graph():
             # 获取初始状态
             initial_state = await TravelChatAgent.get_or_create_state(
                 graph, message, thread_id=session_id
@@ -67,6 +76,7 @@ async def travel_plan_or_chat(chat_message_dto: ChatMessageDTO, session_id: str)
                 parent_name = ""
                 if namespace and len(namespace) != 0:
                     parent_name = namespace[0]
+
                 if mode == "updates":
                     # 这里得到了TravelPlanState的更新
                     message_dict: dict[str, Any] = data  # type: ignore
@@ -74,7 +84,9 @@ async def travel_plan_or_chat(chat_message_dto: ChatMessageDTO, session_id: str)
                     # current_state: TravelPlanState = message_dict[key]
                     log.info(f"\n{"#"*20} 状态更新: {namespace} {key} {"#"*20}\n")
 
-                    plan_result = StreamResult.plan({"node": key, "parent": parent_name})
+                    # 映射节点到处理消息
+                    processing_message = map_node_to_processing_message(parent_name, key)
+                    plan_result = StreamResult.plan(processing_message)
                     yield plan_result.to_sse_format()
 
                 if mode == "messages":
@@ -96,9 +108,14 @@ async def travel_plan_or_chat(chat_message_dto: ChatMessageDTO, session_id: str)
             final_state = await graph.aget_state({"configurable": {"thread_id": session_id}})
 
             if final_state and final_state.values:
-                final_output_dict: dict[str, Any] = final_state.values.get("final_output", "")
-                log.info(f"最终输出：{final_output_dict.keys()}")
-                all_result = StreamResult.all(final_output_dict)
+                final_output: dict[str, Any] | str = final_state.values.get("final_output", "")
+
+                if isinstance(final_output, str):
+                    log.info(f"最终输出：{final_output}")
+                if isinstance(final_output, dict):
+                    log.info(f"最终输出：{final_output.keys()}")
+
+                all_result = StreamResult.all(final_output)
                 yield all_result.to_sse_format()
 
         # 结束标识
@@ -110,3 +127,33 @@ async def travel_plan_or_chat(chat_message_dto: ChatMessageDTO, session_id: str)
         log.error(f"流式对话出错: {e}")
         error_result = StreamResult.error(f"流式对话出错: {str(e)}")
         yield error_result.to_sse_format()
+
+
+def map_node_to_processing_message(parent: str, node: str) -> str:
+    """将节点信息映射到处理消息"""
+    # 节点映射
+    node_mapping = {
+        "intent_recognition": "意图识别",
+        "planning": "整体计划",
+        "executor": "每日规划",
+        "summary": "总结",
+        "chat": "聊天",
+    }
+
+    # 父节点映射
+    parent_node_mapping = {
+        "planning": "整体计划Agent",
+        "executor": "每日规划Agent",
+        "summary": "总结Agent",
+        "chat": "聊天Agent",
+    }
+
+    if not parent:
+        return node_mapping.get(node, "")
+
+    # 检查 parent 中是否包含映射键
+    for key, value in parent_node_mapping.items():
+        if key in parent:
+            return value
+
+    return ""

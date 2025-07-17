@@ -63,9 +63,8 @@ async def register(userRegisterDTO: UserRegisterDTO) -> UserRegisterVO:
         return userRegisterVO
 
 
-async def update(userUpdateDTO: UserUpdateDTO) -> None:
+async def update(new_nickname: str) -> None:
     """更新用户昵称"""
-    new_nickname = userUpdateDTO.new_nickname
 
     # 获取账号
     account_id = BaseContext.get_account_id()
