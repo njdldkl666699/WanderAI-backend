@@ -23,5 +23,5 @@ async def travel_plan_or_chat(
 ):
     """发送消息到指定会话"""
     log.info(f"会话ID: {session_id}")
-    generator = ChatService.stream_chat(chat_message_dto, session_id)
+    generator = ChatService.travel_plan_or_chat(chat_message_dto, session_id)
     return StreamResult.create_streaming_response(generator)

@@ -28,3 +28,7 @@ class ModelNotFoundException(AppException):
 
 class SessionNotFoundException(AppException):
     """会话未找到异常"""
+
+
+class MessageCannotBeEmptyException(AppException):
+    """消息内容不能为空异常"""

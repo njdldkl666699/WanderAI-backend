@@ -1,9 +1,5 @@
-from contextlib import asynccontextmanager
-from langgraph.checkpoint.mysql.asyncmy import AsyncMySaver
 from langgraph.graph import END, StateGraph
 
-from common.context import BaseContext
-from common.properties import DATABASE_URL
 from server.agent.node import (
     chat_node,
     executor_node,
@@ -45,12 +41,3 @@ def create_workflow():
 
 
 workflow = create_workflow()
-
-
-@asynccontextmanager
-async def create_travel_plan_graph():
-    """创建旅行计划图的实例"""
-    # 使用 AsyncMySaver 作为检查点存储
-    async with AsyncMySaver.from_conn_string(DATABASE_URL) as memory:
-        await memory.setup()
-        yield workflow.compile(checkpointer=memory, name="travel_plan_graph")

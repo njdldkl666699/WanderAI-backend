@@ -6,11 +6,10 @@ from langgraph.prebuilt import create_react_agent
 from common.log import log
 from common.properties import (
     EXECUTOR_AGENT_MAX_ITERATIONS,
-    EXECUTOR_LLM_NAME,
     PLAN_AGENT_MAX_ITERATIONS,
     SUMMARY_AGENT_MAX_ITERATIONS,
 )
-from server.agent.state import TravelPlanState
+from server.agent.llm import executor_llm
 from server.agent.model import (
     ExecutorResult,
     FinalOutput,
@@ -26,6 +25,7 @@ from server.agent.prompt_template import (
     summary_prompt_template,
 )
 from server.agent.runnable import chat_agent, intent_chain, plan_agent, summary_agent
+from server.agent.state import TravelPlanState
 from server.agent.tool import load_amap_mcp_tools, search_tool
 
 
@@ -102,15 +102,11 @@ async def executor_node(state: TravelPlanState) -> TravelPlanState:
         executor_results: List[Dict[str, Any]] = []
         async with load_amap_mcp_tools() as amap_mcp_tools:
             executor_agent = create_react_agent(
-                model=EXECUTOR_LLM_NAME, tools=[search_tool, *amap_mcp_tools]
+                model=executor_llm, tools=[search_tool, *amap_mcp_tools]
             )
 
             for schedule in state["daily_schedules"]:
-                print(
-                    "处理第{}天的行程: {}".format(
-                        schedule["day"], schedule["attractions"]
-                    )
-                )
+                print("处理第{}天的行程: {}".format(schedule["day"], schedule["attractions"]))
                 day = schedule["day"]
                 attractions = schedule["attractions"]
 
@@ -194,9 +190,7 @@ def generate_final_output(state: TravelPlanState) -> FinalOutput:
     """生成最终的旅行计划输出"""
 
     summary_result = SummaryResult.model_validate(state["summary_result"])
-    daily_schedules = [
-        Schedule.model_validate(schedule) for schedule in state["daily_schedules"]
-    ]
+    daily_schedules = [Schedule.model_validate(schedule) for schedule in state["daily_schedules"]]
     executor_results = [
         ExecutorResult.model_validate(executor_result)
         for executor_result in state["executor_results"]

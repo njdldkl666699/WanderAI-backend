@@ -9,9 +9,7 @@ from server.agent.prompt_template import hotspot_prompt_template
 async def get_hotspots() -> HotspotsResult:
     """获取热门景点"""
     # 格式化提示词模板
-    hotspot_prompt = hotspot_prompt_template.format(
-        input="请随机推荐中国的若干个热门景点。"
-    )
+    hotspot_prompt = hotspot_prompt_template.format(input="请随机推荐中国的若干个热门景点。")
 
     # 调用Agent
     response = await hotspot_agent_executor.ainvoke(

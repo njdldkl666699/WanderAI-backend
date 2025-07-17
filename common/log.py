@@ -1,8 +1,8 @@
+import atexit
 from datetime import datetime
 import logging
-import re
 import sys
-from logging.handlers import TimedRotatingFileHandler
+import copy
 
 from common.properties import *
 
@@ -23,7 +23,6 @@ class ColoredFormatter(logging.Formatter):
 
     def format(self, record):
         # 创建 record 的副本，避免修改原始 record
-        import copy
 
         record_copy = copy.copy(record)
 
@@ -56,7 +55,19 @@ def setup_logging():
     root_logger.addHandler(console_handler)
     root_logger.addHandler(file_handler)
 
+    # 配置在程序关闭时禁用日志记录
+    atexit.register(disable_logging_on_shutdown)
+
     return root_logger
+
+
+def disable_logging_on_shutdown():
+    """程序关闭时禁用日志记录"""
+    logging.disable(logging.CRITICAL)
+    # 同时禁用所有第三方库的日志
+    for name in ["httpcore", "httpx", "openai"]:
+        logger = logging.getLogger(name)
+        logger.disabled = True
 
 
 def take_over_logging():
