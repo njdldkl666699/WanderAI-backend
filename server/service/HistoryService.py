@@ -6,9 +6,10 @@ from common.exception import (
     UserNotFoundException,
 )
 from model.entity import HistoryTitle
-from model.vo import HistoryTitleVO
+from model.vo import HistoryTitleVO,HistoryMessageVO
 from server.agent.interface import TitleGenerator, TravelChatAgent
 from server.mapper import HistoryTitleMapper, UserHistoryMapper
+from langchain_core.messages import BaseMessage
 
 
 async def get_history_title_by_account_id() -> list[HistoryTitle] | None:
@@ -23,6 +24,24 @@ async def get_history_title_by_account_id() -> list[HistoryTitle] | None:
         return []
 
     return await HistoryTitleMapper.get_titles_by_session_ids(user_sessions)
+
+
+async def get_history_chatContent_by_session_id(session_id: str) -> list[HistoryMessageVO] | None:
+    """获取历史聊天内容"""
+    async with TravelChatAgent.create_travel_plan_graph() as graph:
+        messages = await TravelChatAgent.get_history_messages(graph, session_id)
+    if not messages:
+        raise MessageListEmptyException(MESSAGE_LIST_IS_EMPTY)
+
+    # 将消息转换为HistoryMessageVO
+    history_messages = [
+        HistoryMessageVO(
+            type=message.type,
+            message=message.content,
+        )
+        for message in messages
+    ]
+    return history_messages
 
 
 async def create_history_title(session_id: str) -> HistoryTitleVO:

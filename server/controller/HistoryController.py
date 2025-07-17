@@ -24,4 +24,7 @@ async def create_chat_title(session_id: str = Query(alias="sessionId")):
 
 @router.get("/chatContent")
 async def get_chat_content(session_id: str = Query(alias="sessionId")):
-    pass
+    log.info(f"获取聊天内容，会话id：{session_id}")
+    chat_content = await HistoryService.get_history_chatContent_by_session_id(session_id)
+    return Result.success(chat_content)
+

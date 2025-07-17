@@ -38,7 +38,7 @@ class HistoryMessageVO(BaseModel):
     """历史消息VO"""
 
     type: str = Field(description="消息类型")
-    message: str = Field(description="消息内容")
+    message: str | list[dict]= Field(description="消息内容")
 
 
 class HotspotVO(BaseModel):
