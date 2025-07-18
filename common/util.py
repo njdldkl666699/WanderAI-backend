@@ -2,13 +2,16 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from jose import jwt
-from common.constant import JwtConstant
 
-from common.properties import JWT_ALGORITHM, JWT_SECRET_KEY, JWT_TTL_MINUTES
+from common.constant import JwtConstant
+from common.properties import (
+    JWT_ALGORITHM,
+    JWT_SECRET_KEY,
+    JWT_TTL_MINUTES,
+)
 
 
 class JwtUtil:
-
     @staticmethod
     def create_JWT(data: dict[str, Any]):
         """创建访问令牌"""

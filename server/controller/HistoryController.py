@@ -9,7 +9,7 @@ router = APIRouter(prefix="/history")
 @router.get("/chatList")
 async def get_chat_history():
     """获取历史聊天列表"""
-    log.info(f"获取历史聊天列表")
+    log.info("获取历史聊天列表")
     historyList = await HistoryService.list_history()
     return Result.success(historyList)
 

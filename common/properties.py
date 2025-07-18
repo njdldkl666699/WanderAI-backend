@@ -20,6 +20,13 @@ DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "5"))  # 数据库连接池大小
 DB_MAX_OVERFLOW = int(os.getenv("DB_MAX_OVERFLOW", "10"))  # 数据库连接池最大溢出连接数
 
 
+# Redis配置
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
+
+
 # 日志配置
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")  # 日志级别
 LOG_FORMAT = os.getenv("LOG_FORMAT", "%(asctime)s [%(levelname)s] [%(name)s] - %(message)s")

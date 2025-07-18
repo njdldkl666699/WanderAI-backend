@@ -1,9 +1,20 @@
 from contextlib import asynccontextmanager
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from typing import AsyncGenerator
-from common.properties import *
-from model.schema import Base
+
+from redis import StrictRedis
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 from common.log import log
+from common.properties import (
+    DATABASE_URL,
+    DB_MAX_OVERFLOW,
+    DB_POOL_SIZE,
+    REDIS_DB,
+    REDIS_HOST,
+    REDIS_PASSWORD,
+    REDIS_PORT,
+)
+from model.schema import Base
 
 # 创建异步引擎
 engine = create_async_engine(
@@ -38,3 +49,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
+
+
+redis = StrictRedis(
+    host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, password=REDIS_PASSWORD, decode_responses=True
+)
