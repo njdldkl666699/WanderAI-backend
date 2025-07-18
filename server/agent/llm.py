@@ -1,53 +1,25 @@
 from langchain_openai import ChatOpenAI
-from pydantic import SecretStr
 
-from common.properties import *
-
-hotspot_llm = ChatOpenAI(
-    model=HOTSPOT_LLM_NAME,
-    api_key=SecretStr(QWEN_API_KEY),
-    base_url=QWEN_BASE_URL,
-    temperature=HOTSPOT_TEMPERATURE,
+from common.properties import (
+    CHAT_CONFIG,
+    EXECUTOR_CONFIG,
+    HOTSPOT_CONFIG,
+    INTENT_CONFIG,
+    PLAN_CONFIG,
+    SUMMARY_CONFIG,
+    TITLE_CONFIG,
 )
 
-title_llm = ChatOpenAI(
-    model=TITLE_LLM_NAME,
-    api_key=SecretStr(QWEN_API_KEY),
-    base_url=QWEN_BASE_URL,
-    temperature=TITLE_TEMPERATURE,
-)
+hotspot_llm = ChatOpenAI(**HOTSPOT_CONFIG.model_dump())
 
-intent_llm = ChatOpenAI(
-    model=INTENT_LLM_NAME,
-    api_key=SecretStr(QWEN_API_KEY),
-    base_url=QWEN_BASE_URL,
-    temperature=INTENT_TEMPERATURE,
-)
+title_llm = ChatOpenAI(**TITLE_CONFIG.model_dump())
 
-chat_llm = ChatOpenAI(
-    model=CHAT_LLM_NAME,
-    api_key=SecretStr(QWEN_API_KEY),
-    base_url=QWEN_BASE_URL,
-    temperature=CHAT_TEMPERATURE,
-)
+intent_llm = ChatOpenAI(**INTENT_CONFIG.model_dump())
 
-plan_llm = ChatOpenAI(
-    model=PLAN_LLM_NAME,
-    api_key=SecretStr(QWEN_API_KEY),
-    base_url=QWEN_BASE_URL,
-    temperature=PLAN_TEMPERATURE,
-)
+chat_llm = ChatOpenAI(**CHAT_CONFIG.model_dump())
 
-executor_llm = ChatOpenAI(
-    model=EXECUTOR_LLM_NAME,
-    api_key=SecretStr(QWEN_API_KEY),
-    base_url=QWEN_BASE_URL,
-    temperature=EXECUTOR_TEMPERATURE,
-)
+plan_llm = ChatOpenAI(**PLAN_CONFIG.model_dump())
 
-summary_llm = ChatOpenAI(
-    model=SUMMARY_LLM_NAME,
-    api_key=SecretStr(QWEN_API_KEY),
-    base_url=QWEN_BASE_URL,
-    temperature=SUMMARY_TEMPERATURE,
-)
+executor_llm = ChatOpenAI(**EXECUTOR_CONFIG.model_dump())
+
+summary_llm = ChatOpenAI(**SUMMARY_CONFIG.model_dump())

@@ -21,10 +21,10 @@ def get_status_code(exc: Exception) -> tuple[int, str]:
 # 全局异常处理器
 async def handle_exception(request, exc: Exception):
     """全局异常处理器"""
-    log.error(f"发生异常: {exc}")
+    log.warning(f"发生异常: {exc}")
     status_code, message = get_status_code(exc)
     if status_code >= 500:
-        log.error(f"服务器错误 [{status_code}]：{exc}", exc_info=True)
+        log.error(f"服务器错误 [{status_code}]：{exc}", exc_info=True, stack_info=True)
     else:
         log.warning(f"客户端错误 [{status_code}]：{message}")
     result = Result.error(message)

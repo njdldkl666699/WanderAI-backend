@@ -1,8 +1,8 @@
-import logging
 import os
 from typing import Set
 
 from dotenv import load_dotenv
+from pydantic import BaseModel, Field, SecretStr
 
 # 配置文件
 load_dotenv()
@@ -19,21 +19,23 @@ DATABASE_URL = f"mysql+asyncmy://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB
 DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "5"))  # 数据库连接池大小
 DB_MAX_OVERFLOW = int(os.getenv("DB_MAX_OVERFLOW", "10"))  # 数据库连接池最大溢出连接数
 
+
 # 日志配置
-LEVEL = os.getenv("LEVEL", "DEBUG")  # 日志级别
-FORMAT = os.getenv("FORMAT", "%(asctime)s [%(levelname)s] [%(name)s] - %(message)s")
-DATEFMT = os.getenv("DATEFMT", "%Y-%m-%d %H:%M:%S")
-FILE_PREFIX = os.getenv("FILE_PREFIX", "./logs/app")
-ROLL_WHEN = os.getenv("ROLL_WHEN", "midnight")  # 日志切割时间
-INTERVAL = int(os.getenv("INTERVAL", "1"))  # 切割间隔
-FILE_SUFFIX = os.getenv("FILE_SUFFIX", "%Y-%m-%d.log")  # 日志文件后缀
-SUFFIX_REGEX = os.getenv("SUFFIX_REGEX", r"^\d{4}-\d{2}-\d{2}.log$")  # 日志文件名匹配正则
+LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")  # 日志级别
+LOG_FORMAT = os.getenv("LOG_FORMAT", "%(asctime)s [%(levelname)s] [%(name)s] - %(message)s")
+LOG_DATEFMT = os.getenv("LOG_DATEFMT", "%Y-%m-%d %H:%M:%S")
+LOG_FILE_PREFIX = os.getenv("LOG_FILE_PREFIX", "./logs/wanderai")  # 日志文件前缀
+LOG_ROLL_WHEN = os.getenv("LOG_ROLL_WHEN", "midnight")  # 日志切割时间
+LOG_INTERVAL = int(os.getenv("LOG_INTERVAL", "1"))  # 切割间隔
+LOG_FILE_SUFFIX = os.getenv("LOG_FILE_SUFFIX", "%Y-%m-%d.log")  # 日志文件后缀
+LOG_SUFFIX_REGEX = os.getenv("LOG_SUFFIX_REGEX", r"^\d{4}-\d{2}-\d{2}.log$")  # 日志文件名匹配正则
+
 
 # JWT配置
-SECRET_KEY = os.getenv("SECRET_KEY", "")
-TTL_MINUTES = int(os.getenv("TTL_MINUTES", "300"))
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-TOKEN_NAME = os.getenv("TOKEN_NAME", "Authentication")  # JWT令牌名称
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
+JWT_TTL_MINUTES = int(os.getenv("JWT_TTL_MINUTES", "300"))
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+JWT_TOKEN_NAME = os.getenv("JWT_TOKEN_NAME", "Authentication")  # JWT令牌名称
 
 # JWT校验白名单
 WHITELIST_PATHS: Set[str] = {
@@ -48,7 +50,7 @@ WHITELIST_PATHS: Set[str] = {
 
 
 # 大模型配置
-QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
+QWEN_API_KEY = SecretStr(os.getenv("QWEN_API_KEY", ""))
 QWEN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
 # 地图API配置
@@ -60,20 +62,68 @@ PLAN_AGENT_MAX_ITERATIONS = 4
 EXECUTOR_AGENT_MAX_ITERATIONS = 1000
 SUMMARY_AGENT_MAX_ITERATIONS = 4
 
-# LLM配置
-HOTSPOT_LLM_NAME = "qwen-plus"
-TITLE_LLM_NAME = "qwen-turbo"
-INTENT_LLM_NAME = "qwen-turbo"
-CHAT_LLM_NAME = "qwen-turbo"
-PLAN_LLM_NAME = "qwen-turbo"
-EXECUTOR_LLM_NAME = "qwen-max"
-SUMMARY_LLM_NAME = "qwen-turbo"
 
-# 温度配置
-HOTSPOT_TEMPERATURE = 0.3
-TITLE_TEMPERATURE = 0.7
-INTENT_TEMPERATURE = 0.2
-CHAT_TEMPERATURE = 0.7
-PLAN_TEMPERATURE = 0.2
-EXECUTOR_TEMPERATURE = 0.2
-SUMMARY_TEMPERATURE = 0.2
+class LLMConfig(BaseModel):
+    """LLM配置类"""
+
+    model: str = Field(description="LLM模型名称")
+    api_key: SecretStr = Field(description="API密钥")
+    base_url: str = Field(default="", description="API基础URL")
+    temperature: float = Field(default=0.7, description="生成文本的温度参数")
+
+
+# 热门景点LLM配置
+HOTSPOT_CONFIG = LLMConfig(
+    model="qwen-plus",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=0.3,
+)
+
+# 聊天标题LLM配置
+TITLE_CONFIG = LLMConfig(
+    model="qwen-turbo",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=0.7,
+)
+
+# 意图识别LLM配置
+INTENT_CONFIG = LLMConfig(
+    model="qwen-turbo",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=0.2,
+)
+
+# 聊天LLM配置
+CHAT_CONFIG = LLMConfig(
+    model="qwen-turbo",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=0.7,
+)
+
+# 旅行计划LLM配置
+PLAN_CONFIG = LLMConfig(
+    model="qwen-turbo",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=0.2,
+)
+
+# 每日规划LLM配置
+EXECUTOR_CONFIG = LLMConfig(
+    model="qwen-max",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=0.2,
+)
+
+# 总结LLM配置
+SUMMARY_CONFIG = LLMConfig(
+    model="qwen-turbo",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=0.2,
+)

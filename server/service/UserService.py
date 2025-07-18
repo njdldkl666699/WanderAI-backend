@@ -1,8 +1,7 @@
 import random
 import string
 
-from common.constant.JwtConstant import ACCOUNT_ID
-from common.constant.MessageConstant import PASSWORD_ERROR, USER_NOT_FOUND
+from common.constant import JwtConstant, MessageConstant
 from common.context import BaseContext
 from common.exception import PasswordErrorException, UserNotFoundException
 from common.util import JwtUtil
@@ -27,14 +26,14 @@ async def login(userLoginDTO: UserLoginDTO) -> UserLoginVO:
     user = await UserMapper.get_user_by_account_id(account_id)
     # 检查用户是否存在
     if not user:
-        raise UserNotFoundException(USER_NOT_FOUND)
+        raise UserNotFoundException(MessageConstant.USER_NOT_FOUND)
 
     # 密码比对
     if user.password != password:
-        raise PasswordErrorException(PASSWORD_ERROR)
+        raise PasswordErrorException(MessageConstant.PASSWORD_ERROR)
 
     # 登录成功后，生成jwt令牌
-    token = JwtUtil.create_JWT({ACCOUNT_ID: user.account_id})
+    token = JwtUtil.create_JWT({JwtConstant.ACCOUNT_ID: user.account_id})
     userLoginVO = UserLoginVO(token=token, nickname=user.nickname)
 
     return userLoginVO
@@ -69,6 +68,6 @@ async def update(new_nickname: str) -> None:
     # 获取账号
     account_id = BaseContext.get_account_id()
     if not account_id:
-        raise UserNotFoundException(USER_NOT_FOUND)
+        raise UserNotFoundException(MessageConstant.USER_NOT_FOUND)
 
     await UserMapper.update_nickname_by_account_id(account_id, new_nickname)

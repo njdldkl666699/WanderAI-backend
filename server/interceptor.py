@@ -1,12 +1,11 @@
 from fastapi import FastAPI, Request
 
-from common.constant.JwtConstant import ACCOUNT_ID
-from common.constant.MessageConstant import JWT_INVALID_OR_EXPIRED, PLEASE_LOGIN
+from common.constant import JwtConstant, MessageConstant
 from common.context import BaseContext
 from common.database import get_db
 from common.exception import UnauthorizedException
 from common.log import log
-from common.properties import TOKEN_NAME, WHITELIST_PATHS
+from common.properties import JWT_TOKEN_NAME, WHITELIST_PATHS
 from common.util import JwtUtil
 from server.handler import handle_exception
 
@@ -46,18 +45,18 @@ def setup_jwt_middleware(app: FastAPI):
                 return await call_next(request)
 
             log.debug(f"请求头： {request.headers}")
-            token = request.headers.get(TOKEN_NAME)
+            token = request.headers.get(JWT_TOKEN_NAME)
             log.debug(f"请求头中的令牌: {token}")
             if not token:
-                raise UnauthorizedException(PLEASE_LOGIN)
+                raise UnauthorizedException(MessageConstant.PLEASE_LOGIN)
 
             payload = JwtUtil.parse_JWT(token)
             if not payload:
-                raise UnauthorizedException(JWT_INVALID_OR_EXPIRED)
+                raise UnauthorizedException(MessageConstant.JWT_INVALID_OR_EXPIRED)
 
-            id = payload.get(ACCOUNT_ID)
+            id = payload.get(JwtConstant.ACCOUNT_ID)
             if not id:
-                raise UnauthorizedException(JWT_INVALID_OR_EXPIRED)
+                raise UnauthorizedException(MessageConstant.JWT_INVALID_OR_EXPIRED)
 
             BaseContext.set_account_id(id)
             response = await call_next(request)

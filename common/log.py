@@ -38,7 +38,7 @@ def setup_logging():
     """统一配置所有日志"""
     # 配置根日志记录器
     root_logger = logging.getLogger()
-    root_logger.setLevel(LEVEL)
+    root_logger.setLevel(LOG_LEVEL)
 
     # 清除现有处理器
     root_logger.handlers.clear()
@@ -84,7 +84,7 @@ def take_over_logging():
 
     # 配置 SQLAlchemy 日志
     sqlalchemy_logger = logging.getLogger("sqlalchemy")
-    if LEVEL == "DEBUG":
+    if LOG_LEVEL == "DEBUG":
         sqlalchemy_logger.setLevel(logging.INFO)  # 显示SQL语句
     else:
         sqlalchemy_logger.setLevel(logging.WARNING)
@@ -93,7 +93,7 @@ def take_over_logging():
     sqlalchemy_logger.propagate = True
 
     # 配置特定库的日志级别为 INFO，除非设定为最低等级
-    if LEVEL != "NOTSET":
+    if LOG_LEVEL != "NOTSET":
         logging.getLogger("openai._base_client").setLevel(logging.INFO)
         logging.getLogger("httpcore.http11").setLevel(logging.INFO)
         logging.getLogger("urllib3.connectionpool").setLevel(logging.INFO)
@@ -106,8 +106,8 @@ def create_console_handler():
     """创建控制台处理器"""
     # 创建控制台格式器
     console_formatter = ColoredFormatter(
-        FORMAT,
-        datefmt=DATEFMT,
+        LOG_FORMAT,
+        datefmt=LOG_DATEFMT,
     )
     # 创建控制台处理器
     console_handler = logging.StreamHandler(sys.stdout)
@@ -121,13 +121,13 @@ def create_file_handler():
 
     # 创建文件格式器
     file_formatter = logging.Formatter(
-        FORMAT,
-        datefmt=DATEFMT,
+        LOG_FORMAT,
+        datefmt=LOG_DATEFMT,
     )
 
     # 生成带日期的文件名
     current_date = datetime.now().strftime("%Y-%m-%d")
-    daily_filename = f"{FILE_PREFIX}.{current_date}.log"
+    daily_filename = f"{LOG_FILE_PREFIX}.{current_date}.log"
 
     # 使用普通的 FileHandler，每天程序启动时自动创建新文件
     file_handler = logging.FileHandler(filename=daily_filename, mode="a", encoding="utf-8")

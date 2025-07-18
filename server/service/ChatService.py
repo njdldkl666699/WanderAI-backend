@@ -4,7 +4,7 @@ from typing import Any, AsyncGenerator
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.runnables.config import RunnableConfig
 
-from common.constant.MessageConstant import MESSAGE_CANNOT_BE_EMPTY, PLEASE_LOGIN
+from common.constant import MessageConstant
 from common.context import BaseContext
 from common.exception import MessageCannotBeEmptyException, UserNotFoundException
 from common.log import log
@@ -23,7 +23,7 @@ async def create_session() -> CreateSessionVO:
     # 将新session_id存储到数据库中
     account_id = BaseContext.get_account_id()
     if not account_id:
-        raise UserNotFoundException(PLEASE_LOGIN)
+        raise UserNotFoundException(MessageConstant.PLEASE_LOGIN)
 
     # 生成session_id放到数据库
     new_user_history = UserHistory(
@@ -43,7 +43,7 @@ async def travel_plan_or_chat(
         message = chat_message_dto.message
         # 检查消息内容是否为空
         if not message or not message.strip():
-            raise MessageCannotBeEmptyException(MESSAGE_CANNOT_BE_EMPTY)
+            raise MessageCannotBeEmptyException(MessageConstant.MESSAGE_CANNOT_BE_EMPTY)
 
         # 创建旅行计划图
         async for graph in TravelChatAgent.create_travel_plan_graph():

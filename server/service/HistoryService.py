@@ -1,6 +1,6 @@
 from langchain_core.messages import AIMessage, HumanMessage
 
-from common.constant.MessageConstant import MESSAGE_LIST_IS_EMPTY, PLEASE_LOGIN, SESSION_NOT_FOUND
+from common.constant import MessageConstant
 from common.context import BaseContext
 from common.exception import (
     MessageListEmptyException,
@@ -17,7 +17,7 @@ async def list_history() -> list[HistoryListVO]:
     """获取历史标题列表"""
     account_id = BaseContext.get_account_id()
     if not account_id:
-        raise UserNotFoundException(PLEASE_LOGIN)
+        raise UserNotFoundException(MessageConstant.PLEASE_LOGIN)
 
     user_history_list = await UserHistoryMapper.list_by_account_id(account_id)
     history_list_vos = [
@@ -34,13 +34,13 @@ async def create_history_title(session_id: str) -> HistoryTitleVO:
     """创建新的历史标题"""
     account_id = BaseContext.get_account_id()
     if not account_id:
-        raise UserNotFoundException(PLEASE_LOGIN)
+        raise UserNotFoundException(MessageConstant.PLEASE_LOGIN)
 
     # 根据会话id获取当前历史记录
     user_history_list = await UserHistoryMapper.get_by_session_account(session_id, account_id)
     if not user_history_list:
         # 如果没有找到对应的会话id，抛出异常
-        raise SessionNotFoundException(SESSION_NOT_FOUND)
+        raise SessionNotFoundException(MessageConstant.SESSION_NOT_FOUND)
 
     messages = None
     async for graph in TravelChatAgent.create_travel_plan_graph():
@@ -48,7 +48,7 @@ async def create_history_title(session_id: str) -> HistoryTitleVO:
         messages = await TravelChatAgent.get_history_messages(graph, session_id)
 
     if not messages:
-        raise MessageListEmptyException(MESSAGE_LIST_IS_EMPTY)
+        raise MessageListEmptyException(MessageConstant.MESSAGE_LIST_IS_EMPTY)
 
     # 调用AI模型生成标题
     title = TitleGenerator.generate_title(messages)
@@ -72,7 +72,7 @@ async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessage
     async for graph in TravelChatAgent.create_travel_plan_graph():
         messages = await TravelChatAgent.get_history_messages(graph, session_id)
     if not messages:
-        raise MessageListEmptyException(MESSAGE_LIST_IS_EMPTY)
+        raise MessageListEmptyException(MessageConstant.MESSAGE_LIST_IS_EMPTY)
 
     # 将消息转换为HistoryMessageVO
     history_messages: list[HistoryMessageVO] = []
