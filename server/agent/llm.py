@@ -23,3 +23,5 @@ plan_llm = ChatOpenAI(**PLAN_CONFIG.model_dump())
 executor_llm = ChatOpenAI(**EXECUTOR_CONFIG.model_dump())
 
 summary_llm = ChatOpenAI(**SUMMARY_CONFIG.model_dump())
+
+visual_llm = ChatOpenAI(**CHAT_CONFIG.model_dump())

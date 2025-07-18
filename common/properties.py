@@ -69,7 +69,7 @@ class LLMConfig(BaseModel):
     model: str = Field(description="LLM模型名称")
     api_key: SecretStr = Field(description="API密钥")
     base_url: str = Field(default="", description="API基础URL")
-    temperature: float = Field(default=0.7, description="生成文本的温度参数")
+    temperature: float | None = Field(default=0.7, description="生成文本的温度参数")
 
 
 # 热门景点LLM配置
@@ -126,4 +126,12 @@ SUMMARY_CONFIG = LLMConfig(
     api_key=QWEN_API_KEY,
     base_url=QWEN_BASE_URL,
     temperature=0.2,
+)
+
+# 图像理解LLM配置
+VISUAL_CONFIG = LLMConfig(
+    model="qwen-vl-plus",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=None,
 )

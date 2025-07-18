@@ -1,9 +1,9 @@
 from langchain_core.messages import HumanMessage
 
-from server.agent.runnable import hotspot_agent_executor
 from server.agent.model import HotspotsResult
 from server.agent.output_parser import hotspot_parser
 from server.agent.prompt_template import hotspot_prompt_template
+from server.agent.runnable import hotspot_agent_executor
 
 
 async def get_hotspots() -> HotspotsResult:
