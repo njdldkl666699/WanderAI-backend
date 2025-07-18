@@ -87,7 +87,7 @@ def planning_node(state: TravelPlanState) -> TravelPlanState:
     except Exception as e:
         log.warning("计划Agent发生错误: %s", e, exc_info=e, stack_info=True)
         state["daily_schedules"] = [
-            {"day": i + 1, "attractions": [f"{state['location']}景点{i+1}"]}
+            {"day": i + 1, "attractions": [f"{state['location']}景点{i + 1}"]}
             for i in range(state["duration"])
         ]
 
@@ -197,14 +197,13 @@ def generate_final_output(state: TravelPlanState) -> FinalOutput:
         ExecutorResult.model_validate(executor_result)
         for executor_result in state["executor_results"]
     ]
-    # TODO: 生成景点静态地图URL
-    attraction_maps = []
 
     final_output = FinalOutput(
         summary_result=summary_result,
         daily_schedules=daily_schedules,
         executor_results=executor_results,
-        attraction_maps=attraction_maps,
+        attraction_maps=[],  # 在Service层获取景点静态地图
+        weather_vo=None,  # 在Service层获取天气信息
     )
     return final_output
 

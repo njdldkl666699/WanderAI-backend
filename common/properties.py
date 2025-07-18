@@ -80,17 +80,12 @@ def get_static_map_url(location: str) -> str:
     return f"https://restapi.amap.com/v3/staticmap?key={AMAP_API_KEY}&location={location}&zoom=15&markers=mid,,A:{location}"
 
 
-def get_weather_info_url(adcode: str) -> str:
-    """获取天气信息API URL"""
-    return f"https://restapi.amap.com/v3/weather/weatherInfo?key={AMAP_API_KEY}&city={adcode}"
-
-
 # Agent迭代次数配置
 PLAN_AGENT_MAX_ITERATIONS = 4
 EXECUTOR_AGENT_MAX_ITERATIONS = 1000
 SUMMARY_AGENT_MAX_ITERATIONS = 4
 
-# 图片搜索
+# 接口盒子API配置
 APIHZ_ID = os.getenv("APIHZ_ID")
 APIHZ_KEY = os.getenv("APIHZ_KEY")
 
@@ -98,6 +93,11 @@ APIHZ_KEY = os.getenv("APIHZ_KEY")
 def get_search_image_url(word: str) -> str:
     """获取图片搜索API URL"""
     return f"https://cn.apihz.cn/api/img/apihzimgbaidu.php?id={APIHZ_ID}&key={APIHZ_KEY}&limit=1&page=1&words={word}"
+
+
+def get_weather_info_url(province: str, city: str) -> str:
+    """获取天气信息API URL"""
+    return f"https://cn.apihz.cn/api/tianqi/tengxun.php?id={APIHZ_ID}&key={APIHZ_KEY}&province={province}&city={city}"
 
 
 class LLMConfig(BaseModel):

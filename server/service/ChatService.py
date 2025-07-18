@@ -1,5 +1,6 @@
+from datetime import date, timedelta
 import uuid
-from typing import Any, AsyncGenerator, Dict, List
+from typing import Any, AsyncGenerator, Dict, List, Tuple
 
 import requests
 from langchain_core.messages.ai import AIMessageChunk
@@ -9,12 +10,12 @@ from common.constant import MessageConstant
 from common.context import BaseContext
 from common.exception import MessageCannotBeEmptyException, UserNotFoundException
 from common.log import log
-from common.properties import get_geocode_url, get_static_map_url
+from common.properties import get_geocode_url, get_static_map_url, get_weather_info_url
 from common.util import AliOssUtil
 from model.dto import ChatMessageDTO
 from model.entity import UserHistory
 from model.result import StreamResult
-from model.vo import CreateSessionVO
+from model.vo import CreateSessionVO, Weather, WeatherVO
 from server.agent.interface import TravelChatAgent
 from server.agent.model import AttractionStaticMap, ExecutorResult
 from server.mapper import UserHistoryMapper
@@ -96,9 +97,10 @@ async def travel_plan_or_chat(
 
                     if "chat" in parent_name:
                         # 如果父节点是聊天节点，直接输出流式聊天消息
-                        content: str = message_chunk.content  # type: ignore
-                        chat_result = StreamResult.chat(content)
-                        yield chat_result.to_sse_format()
+                        content = message_chunk.content
+                        if isinstance(content, str):
+                            chat_result = StreamResult.chat(content)
+                            yield chat_result.to_sse_format()
 
             # 最终状态
             final_state = await graph.aget_state({"configurable": {"thread_id": session_id}})
@@ -111,7 +113,8 @@ async def travel_plan_or_chat(
                     log.info(f"最终输出：{final_output}")
                 if isinstance(final_output, dict):
                     # 旅行规划输出
-                    set_attraction_maps(final_output)
+                    (province, city) = set_attraction_maps(final_output)
+                    final_output["weather_vo"] = get_weather(province, city).model_dump()
                     log.info(f"最终输出：{final_output.keys()}")
 
                 all_result = StreamResult.all(final_output)
@@ -158,8 +161,8 @@ def map_node_to_processing_message(parent: str, node: str) -> str:
     return ""
 
 
-def set_attraction_maps(final_output: dict[str, Any]) -> None:
-    """设置景点静态地图"""
+def set_attraction_maps(final_output: dict[str, Any]) -> Tuple[str, str]:
+    """设置景点静态地图，返回省份和城市"""
     # 从 executor_results 中获取景点名称
     executor_results = final_output.get("executor_results", [])
     executor_result_list = [
@@ -168,6 +171,9 @@ def set_attraction_maps(final_output: dict[str, Any]) -> None:
 
     # 根据景点名称获取静态地图URL
     attraction_maps: List[Dict[str, Any]] = []
+
+    province: str = ""
+    city: str = ""
 
     for executor_result in executor_result_list:
         # 从每日行程的景点详细信息中提取景点名称
@@ -183,11 +189,18 @@ def set_attraction_maps(final_output: dict[str, Any]) -> None:
                 continue
 
             # 获取经纬度信息
-            if not geocode_response.json().get("geocodes"):
-                log.warning(f"地理编码API未返回有效的经纬度信息：{geocode_response.json()}")
+            resp_json = geocode_response.json()
+            if not resp_json.get("geocodes"):
+                log.warning(f"地理编码API未返回有效的经纬度信息：{resp_json}")
                 continue
 
-            location: str = geocode_response.json()["geocodes"][0]["location"]
+            geocode = resp_json["geocodes"][0]
+            location: str = geocode["location"]
+            if not province or not city:
+                # 获取省份和城市，整个循环只获取一次
+                province = geocode["province"]
+                city = geocode["city"]
+
             # 更新原有的coordinates字段
             attraction_detail.coordinates = location
             static_map_url = get_static_map_url(location)
@@ -217,3 +230,39 @@ def set_attraction_maps(final_output: dict[str, Any]) -> None:
 
     # 将景点静态地图信息添加到最终输出中
     final_output["attraction_maps"] = attraction_maps
+
+    return (province, city)
+
+
+def get_weather(province: str, city: str) -> WeatherVO:
+    """获取城市的天气"""
+    url = get_weather_info_url(province, city)
+    response = requests.get(url)
+    json: dict[str, Any] = response.json()
+    if json.get("status") == 400:
+        log.warning(f"获取天气信息失败：{json.get('msg')}")
+        return WeatherVO(province=province, city=city, weathers=[])
+
+    resp_weathers: list[dict[str, Any]] = json.get("data", [])
+
+    weathers: List[Weather] = []
+    current_date = date.today()
+    i: int = 0
+    for weather in resp_weathers:
+        # 日期相同时，追加到列表中
+        if weather["time"] == current_date.strftime("%Y-%m-%d"):
+            weathers.append(
+                Weather(
+                    date=current_date,
+                    max_degree=weather["max_degree"],
+                    min_degree=weather["min_degree"],
+                    day_weather=weather["day_weather"],
+                )
+            )
+            # 增加一天
+            current_date += timedelta(days=1)
+            i += 1
+            if i == 4:
+                break
+
+    return WeatherVO(province=province, city=city, weathers=weathers)

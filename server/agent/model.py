@@ -1,5 +1,8 @@
 from typing import List, Literal
+
 from pydantic import BaseModel, Field
+
+from model.vo import WeatherVO
 
 
 class Hotspot(BaseModel):
@@ -35,9 +38,7 @@ class Schedule(BaseModel):
 class PlanResult(BaseModel):
     """旅行计划结果"""
 
-    daily_schedules: List[Schedule] = Field(
-        default_factory=list, description="每日行程安排列表"
-    )
+    daily_schedules: List[Schedule] = Field(default_factory=list, description="每日行程安排列表")
 
 
 class Route(BaseModel):
@@ -106,12 +107,11 @@ class FinalOutput(BaseModel):
     """最终输出格式"""
 
     summary_result: SummaryResult = Field(description="旅行计划总结结果")
-    daily_schedules: List[Schedule] = Field(
-        default_factory=list, description="每日行程安排列表"
-    )
+    daily_schedules: List[Schedule] = Field(default_factory=list, description="每日行程安排列表")
     executor_results: List[ExecutorResult] = Field(
         default_factory=list, description="每日详细行程计划列表"
     )
     attraction_maps: List[AttractionStaticMap] = Field(
         default_factory=list, description="景点静态地图信息列表"
     )
+    weather_vo: WeatherVO | None = Field(description="天气VO")

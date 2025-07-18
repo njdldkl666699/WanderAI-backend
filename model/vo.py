@@ -1,4 +1,4 @@
-from typing import Any
+from datetime import date as Date
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
@@ -55,3 +55,22 @@ class HotspotVO(BaseModel):
     name: str = Field(description="景点名称")
     description: str = Field(description="景点描述")
     image: str = Field(description="景点图片URL")
+
+
+class Weather(BaseModel):
+    """一天天气"""
+
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+
+    date: Date = Field(description="日期")
+    max_degree: str = Field(description="最高温度")
+    min_degree: str = Field(description="最低温度")
+    day_weather: str = Field(description="白天天气")
+
+
+class WeatherVO(BaseModel):
+    """天气VO"""
+
+    province: str = Field(description="省份")
+    city: str = Field(description="城市")
+    weathers: list[Weather] = Field(description="天气信息列表")
