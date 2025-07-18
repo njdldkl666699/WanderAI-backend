@@ -76,7 +76,7 @@ class AliOssUtil:
         """
         try:
             AliOssUtil.client.put_object(
-                oss.PutObjectRequest(bucket=OSS_BUCKET_NAME, key=key, data=data)
+                oss.PutObjectRequest(bucket=OSS_BUCKET_NAME, key=key, body=data)
             )
             return f"https://{OSS_BUCKET_NAME}.{OSS_ENDPOINT}/{key}"
         except Exception as e:

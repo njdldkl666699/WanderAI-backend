@@ -91,7 +91,7 @@ async def travel_plan_or_chat(
                     metadata: dict[str, Any] = metadata
                     node_name = metadata["langgraph_node"]
                     if current_node != node_name:
-                        log.info(f"\n{'#' * 20} 当前节点：{namespace} {node_name} {'#' * 20}\n")
+                        log.info(f"\n{'#' * 20} 当前节点：{parent_name} {node_name} {'#' * 20}\n")
                         current_node = node_name
 
                     if "chat" in parent_name:
