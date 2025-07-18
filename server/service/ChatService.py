@@ -1,6 +1,7 @@
 import uuid
-from typing import Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Dict, List
 
+import requests
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.runnables.config import RunnableConfig
 
@@ -8,11 +9,14 @@ from common.constant import MessageConstant
 from common.context import BaseContext
 from common.exception import MessageCannotBeEmptyException, UserNotFoundException
 from common.log import log
+from common.properties import get_geocode_url, get_static_map_url
+from common.util import AliOssUtil
 from model.dto import ChatMessageDTO
 from model.entity import UserHistory
 from model.result import StreamResult
 from model.vo import CreateSessionVO
 from server.agent.interface import TravelChatAgent
+from server.agent.model import AttractionStaticMap, ExecutorResult
 from server.mapper import UserHistoryMapper
 
 
@@ -74,7 +78,7 @@ async def travel_plan_or_chat(
                     message_dict: dict[str, Any] = data  # type: ignore
                     key = list(message_dict.keys())[0]
                     # current_state: TravelPlanState = message_dict[key]
-                    log.info(f"\n{"#"*20} 状态更新: {parent_name} {key} {"#"*20}\n")
+                    log.info(f"\n{'#' * 20} 状态更新: {parent_name} {key} {'#' * 20}\n")
 
                     # 映射节点到处理消息
                     processing_message = map_node_to_processing_message(parent_name, key)
@@ -87,7 +91,7 @@ async def travel_plan_or_chat(
                     metadata: dict[str, Any] = metadata
                     node_name = metadata["langgraph_node"]
                     if current_node != node_name:
-                        log.info(f"\n{"#"*20} 当前节点：{namespace} {node_name} {"#"*20}\n")
+                        log.info(f"\n{'#' * 20} 当前节点：{namespace} {node_name} {'#' * 20}\n")
                         current_node = node_name
 
                     if "chat" in parent_name:
@@ -107,6 +111,7 @@ async def travel_plan_or_chat(
                     log.info(f"最终输出：{final_output}")
                 if isinstance(final_output, dict):
                     # 旅行规划输出
+                    set_attraction_maps(final_output)
                     log.info(f"最终输出：{final_output.keys()}")
 
                 all_result = StreamResult.all(final_output)
@@ -151,3 +156,64 @@ def map_node_to_processing_message(parent: str, node: str) -> str:
             return value
 
     return ""
+
+
+def set_attraction_maps(final_output: dict[str, Any]) -> None:
+    """设置景点静态地图"""
+    # 从 executor_results 中获取景点名称
+    executor_results = final_output.get("executor_results", [])
+    executor_result_list = [
+        ExecutorResult.model_validate(executor_result) for executor_result in executor_results
+    ]
+
+    # 根据景点名称获取静态地图URL
+    attraction_maps: List[Dict[str, Any]] = []
+
+    for executor_result in executor_result_list:
+        # 从每日行程的景点详细信息中提取景点名称
+        for attraction_detail in executor_result.attraction_details:
+            address = attraction_detail.address
+            attraction_name = attraction_detail.attraction
+
+            # 根据address调用地理编码API
+            geocode_url = get_geocode_url(address)
+            geocode_response = requests.get(geocode_url)
+            if geocode_response.status_code != 200:
+                log.warning(f"高德地图地理编码API调用失败：{geocode_response.status_code}")
+                continue
+
+            # 获取经纬度信息
+            if not geocode_response.json().get("geocodes"):
+                log.warning(f"地理编码API未返回有效的经纬度信息：{geocode_response.json()}")
+                continue
+
+            location: str = geocode_response.json()["geocodes"][0]["location"]
+            # 更新原有的coordinates字段
+            attraction_detail.coordinates = location
+            static_map_url = get_static_map_url(location)
+
+            # 上传静态地图到阿里OSS
+            map_response = requests.get(static_map_url)
+            if map_response.status_code != 200:
+                log.warning(f"获取静态地图失败：{map_response.status_code}")
+                continue
+
+            static_map_data: bytes = map_response.content
+            uuid_key = str(uuid.uuid4())
+            oss_key = f"static_maps/{uuid_key}.png"
+            static_map_oss_url = AliOssUtil.put_object(oss_key, static_map_data)
+
+            # 创建景点静态地图对象
+            attraction_map = AttractionStaticMap(
+                attraction=attraction_name, static_map_url=static_map_oss_url
+            )
+
+            attraction_maps.append(attraction_map.model_dump())
+
+    # 将更新后的 executor_result_list 重新赋值到 final_output
+    final_output["executor_results"] = [
+        executor_result.model_dump() for executor_result in executor_result_list
+    ]
+
+    # 将景点静态地图信息添加到最终输出中
+    final_output["attraction_maps"] = attraction_maps

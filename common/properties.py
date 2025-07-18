@@ -26,6 +26,11 @@ REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 
+# 阿里OSS配置
+OSS_REGION = os.getenv("OSS_REGION", "")
+OSS_BUCKET_NAME = os.getenv("OSS_BUCKET_NAME", "")
+OSS_ENDPOINT = os.getenv("OSS_ENDPOINT")
+
 
 # 日志配置
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")  # 日志级别
@@ -64,10 +69,35 @@ QWEN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 AMAP_API_KEY = os.getenv("AMAP_API_KEY")
 AMAP_MCP_URL = f"https://mcp.amap.com/mcp?key={AMAP_API_KEY}"
 
+
+def get_geocode_url(address: str) -> str:
+    """获取地理编码API URL"""
+    return f"https://restapi.amap.com/v3/geocode/geo?key={AMAP_API_KEY}&address={address}"
+
+
+def get_static_map_url(location: str) -> str:
+    """获取静态地图API URL"""
+    return f"https://restapi.amap.com/v3/staticmap?key={AMAP_API_KEY}&location={location}&zoom=15&markers=mid,,A:{location}"
+
+
+def get_weather_info_url(adcode: str) -> str:
+    """获取天气信息API URL"""
+    return f"https://restapi.amap.com/v3/weather/weatherInfo?key={AMAP_API_KEY}&city={adcode}"
+
+
 # Agent迭代次数配置
 PLAN_AGENT_MAX_ITERATIONS = 4
 EXECUTOR_AGENT_MAX_ITERATIONS = 1000
 SUMMARY_AGENT_MAX_ITERATIONS = 4
+
+# 图片搜索
+APIHZ_ID = os.getenv("APIHZ_ID")
+APIHZ_KEY = os.getenv("APIHZ_KEY")
+
+
+def get_search_image_url(word: str) -> str:
+    """获取图片搜索API URL"""
+    return f"https://cn.apihz.cn/api/img/apihzimgbaidu.php?id={APIHZ_ID}&key={APIHZ_KEY}&limit=1&page=1&words={word}"
 
 
 class LLMConfig(BaseModel):
