@@ -13,17 +13,21 @@ from server.agent.interface import TitleGenerator, TravelChatAgent
 from server.mapper import UserHistoryMapper
 
 
-async def list_history() -> list[HistoryListVO] | None:
+async def list_history() -> list[HistoryListVO]:
     """获取历史标题列表"""
     account_id = BaseContext.get_account_id()
     if not account_id:
         raise UserNotFoundException(PLEASE_LOGIN)
 
     user_history_list = await UserHistoryMapper.list_by_account_id(account_id)
-    return [
+    history_list_vos = [
         HistoryListVO(title=user_history.title, session_id=user_history.session_id)
         for user_history in user_history_list
     ]
+
+    # 逆序返回历史列表
+    history_list_vos.reverse()
+    return history_list_vos
 
 
 async def create_history_title(session_id: str) -> HistoryTitleVO:
@@ -62,7 +66,7 @@ async def create_history_title(session_id: str) -> HistoryTitleVO:
     return HistoryTitleVO(title=title)
 
 
-async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessageVO] | None:
+async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessageVO]:
     """获取历史聊天内容"""
     messages = None
     async for graph in TravelChatAgent.create_travel_plan_graph():
