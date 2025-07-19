@@ -21,7 +21,7 @@ class UserHistoryModel(Base):
 
     id = Column(INT, primary_key=True, autoincrement=True)
     account_id = Column(VARCHAR(10), nullable=False)
-    session_id = Column(TEXT, nullable=False)
+    session_id = Column(VARCHAR(150), nullable=False)
     title = Column(VARCHAR(255))
 
 

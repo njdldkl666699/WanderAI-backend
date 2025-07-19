@@ -4,7 +4,7 @@ import logging
 import sys
 import copy
 
-from common.properties import *
+from common.properties import LOG_DATEFMT, LOG_FILE_PREFIX, LOG_FORMAT, LOG_LEVEL
 
 
 # 日志配置

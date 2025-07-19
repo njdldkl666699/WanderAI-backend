@@ -1,5 +1,5 @@
-from datetime import date, timedelta
 import uuid
+from datetime import date, timedelta
 from typing import Any, AsyncGenerator, Dict, List, Tuple
 
 import requests
@@ -95,12 +95,13 @@ async def travel_plan_or_chat(
                         log.info(f"\n{'#' * 20} 当前节点：{parent_name} {node_name} {'#' * 20}\n")
                         current_node = node_name
 
-                    if "chat" in parent_name:
-                        # 如果父节点是聊天节点，直接输出流式聊天消息
-                        content = message_chunk.content
-                        if isinstance(content, str):
-                            chat_result = StreamResult.chat(content)
-                            yield chat_result.to_sse_format()
+                    if "chat" in parent_name and "agent" in node_name:
+                        # 如果父节点是聊天节点且子节点不是工具节点，
+                        # 直接输出流式聊天消息
+                        content: str = message_chunk.content  # type: ignore
+                        print(content)
+                        chat_result = StreamResult.chat(content)
+                        yield chat_result.to_sse_format()
 
             # 最终状态
             final_state = await graph.aget_state({"configurable": {"thread_id": session_id}})
