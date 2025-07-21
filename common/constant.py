@@ -17,4 +17,6 @@ class MessageConstant:
     MODEL_CANNOT_BE_EMPTY = "模型名称不能为空"
     SESSION_NOT_FOUND = "会话未找到"
     MESSAGE_CANNOT_BE_EMPTY = "消息内容不能为空"
+    IMAGE_CANNOT_BE_EMPTY = "图片URL不能为空"
     MESSAGE_LIST_IS_EMPTY = "消息列表为空"
+    UPLOAD_FAILED = "文件上传失败"

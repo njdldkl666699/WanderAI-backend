@@ -28,3 +28,12 @@ class SuggestionDTO(BaseModel):
     """用户反馈信息DTO"""
 
     message: str = Field(default="", description="用户反馈的信息")
+
+
+class GuideMessageDTO(BaseModel):
+    """导游消息DTO"""
+
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+
+    image_url: str = Field(description="导游发送的图片URL")
+    message: str = Field(description="导游发送的消息内容")

@@ -20,7 +20,7 @@ class Result(BaseModel):
 class StreamResult(BaseModel):
     """流式响应结果封装"""
 
-    type: Literal["chat", "plan", "end", "error", "all"] = Field(description="数据类型")
+    type: Literal["chat", "plan", "end", "error", "all", "audio"] = Field(description="数据类型")
     content: Any = Field(description="内容")
 
     def to_sse_format(self) -> str:
@@ -66,3 +66,8 @@ class StreamResult(BaseModel):
     def error(message: str) -> "StreamResult":
         """创建错误信息"""
         return StreamResult(type="error", content=message)
+
+    @staticmethod
+    def audio(content: str) -> "StreamResult":
+        """创建音频消息"""
+        return StreamResult(type="audio", content=content)

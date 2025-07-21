@@ -1,5 +1,5 @@
 from langchain_core.messages import BaseMessage
-from server.agent.runnable import title_chain
+from agent.runnable import title_chain
 
 
 def generate_title(messages: list[BaseMessage]) -> str:

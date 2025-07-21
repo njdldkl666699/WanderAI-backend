@@ -3,9 +3,11 @@ from datetime import date, timedelta
 from typing import Any, AsyncGenerator, Dict, List, Tuple
 
 import requests
-from langchain_core.messages.ai import AIMessageChunk
+from langchain_core.messages import AIMessage, AIMessageChunk
 from langchain_core.runnables.config import RunnableConfig
+from langgraph.graph.state import CompiledStateGraph
 
+from agent.state import TravelPlanState
 from common.constant import MessageConstant
 from common.context import BaseContext
 from common.exception import MessageCannotBeEmptyException, UserNotFoundException
@@ -16,8 +18,8 @@ from model.dto import ChatMessageDTO
 from model.entity import UserHistory
 from model.result import StreamResult
 from model.vo import CreateSessionVO, Weather, WeatherVO
-from server.agent.interface import TravelChatAgent
-from server.agent.model import AttractionStaticMap, ExecutorResult
+from agent.model import AttractionStaticMap, ExecutorResult
+from server.agent import TravelChatAgent
 from server.mapper import UserHistoryMapper
 
 
@@ -60,7 +62,7 @@ async def travel_plan_or_chat(
             # 初始化当前节点
             current_node: str = ""
 
-            # 使用updates和messages混合流式处理模式
+            # 使用 updates 和 messages 混合流式处理模式
             async for chunk in graph.astream(
                 initial_state,
                 config=RunnableConfig(configurable={"thread_id": session_id}),
@@ -103,26 +105,10 @@ async def travel_plan_or_chat(
                         chat_result = StreamResult.chat(content)
                         yield chat_result.to_sse_format()
 
-            # 最终状态
-            final_state = await graph.aget_state({"configurable": {"thread_id": session_id}})
-
-            if final_state and final_state.values:
-                final_output: dict[str, Any] | str = final_state.values.get("final_output", "")
-
-                if isinstance(final_output, str):
-                    # chat输出
-                    log.info(f"最终输出：{final_output}")
-
-                if isinstance(final_output, dict):
-                    # 旅行规划输出
-                    (province, city) = set_attraction_maps(final_output)
-                    final_output["weather_vo"] = get_weather(province, city).model_dump()
-                    # 更新state
-                    final_state.values["final_output"] = final_output
-                    log.info(f"最终输出：{final_output.keys()}")
-
-                all_result = StreamResult.all(final_output)
-                yield all_result.to_sse_format()
+            # 生成最终状态并输出
+            final_output = await create_final_output(graph, session_id)
+            all_result = StreamResult.all(final_output)
+            yield all_result.to_sse_format()
 
         # 结束标识
         log.info("流式对话结束")
@@ -133,6 +119,42 @@ async def travel_plan_or_chat(
         log.error(f"流式对话出错: {e}")
         error_result = StreamResult.error(f"流式对话出错: {str(e)}")
         yield error_result.to_sse_format()
+
+
+async def create_final_output(
+    graph: CompiledStateGraph[TravelPlanState, TravelPlanState, TravelPlanState], session_id: str
+) -> dict[str, Any] | str:
+    """创建最终的旅行计划输出"""
+    final_state = await graph.aget_state({"configurable": {"thread_id": session_id}})
+
+    if not final_state or not final_state.values:
+        log.warning("没有找到最终状态，可能是会话已结束或不存在")
+        return ""
+
+    final_output: dict[str, Any] | str = final_state.values.get("final_output", "")
+
+    if isinstance(final_output, str):
+        # chat输出
+        log.info(f"最终输出：{final_output}")
+
+    if isinstance(final_output, dict):
+        # 旅行规划输出
+        (province, city) = set_attraction_maps(final_output)
+        final_output["weather_vo"] = get_weather(province, city).model_dump()
+
+        # 更新state的final_output
+        final_state.values["final_output"] = final_output
+        # 将消息追加到 messages 中
+        final_state.values["messages"].append(AIMessage([final_output]))
+        # 更新状态节点（保存到检查点）
+        await graph.aupdate_state(
+            config={"configurable": {"thread_id": session_id}},
+            values=final_state.values,
+        )
+
+        log.info(f"最终输出：{final_output.keys()}")
+
+    return final_output
 
 
 def map_node_to_processing_message(parent: str, node: str) -> str:

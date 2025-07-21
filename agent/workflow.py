@@ -1,17 +1,19 @@
 from langgraph.graph import END, StateGraph
 
-from server.agent.node import (
+from agent.node import (
     chat_node,
     executor_node,
     intent_recognition_node,
     planning_node,
     should_plan_or_chat,
     summary_node,
+    text_node,
+    visual_node,
 )
-from server.agent.state import TravelPlanState
+from agent.state import TravelGuideState, TravelPlanState
 
 
-def create_workflow():
+def create_travel_plan_workflow():
     """创建旅行计划图"""
 
     workflow = StateGraph(TravelPlanState)
@@ -40,4 +42,25 @@ def create_workflow():
     return workflow
 
 
-workflow = create_workflow()
+travel_plan_workflow = create_travel_plan_workflow()
+
+
+def create_travel_guide_workflow():
+    """创建图像识别图"""
+    workflow = StateGraph(TravelGuideState)
+
+    # 添加节点
+    workflow.add_node("visual", visual_node)
+    workflow.add_node("text", text_node)
+
+    # 设置入口点
+    workflow.set_entry_point("visual")
+
+    # 添加边：visual -> text -> END
+    workflow.add_edge("visual", "text")
+    workflow.add_edge("text", END)
+
+    return workflow
+
+
+travel_guide_workflow = create_travel_guide_workflow()

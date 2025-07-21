@@ -9,6 +9,7 @@ from server.controller import (
     HistoryController,
     HotspotController,
     SuggestionController,
+    UploadController,
     UserController,
 )
 from server.handler import setup_exception_handler
@@ -45,5 +46,6 @@ api_router.include_router(ChatController.router)
 api_router.include_router(HotspotController.router)
 api_router.include_router(HistoryController.router)
 api_router.include_router(SuggestionController.router)
+api_router.include_router(UploadController.router)
 
 app.include_router(api_router)

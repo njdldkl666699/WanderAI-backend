@@ -9,7 +9,7 @@ from common.exception import (
 )
 from model.entity import UserHistory
 from model.vo import HistoryListVO, HistoryMessageVO, HistoryTitleVO
-from server.agent.interface import TitleGenerator, TravelChatAgent
+from server.agent import TitleGenerator, TravelChatAgent
 from server.mapper import UserHistoryMapper
 
 
@@ -76,12 +76,66 @@ async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessage
 
     # 将消息转换为HistoryMessageVO
     history_messages: list[HistoryMessageVO] = []
+
     for message in messages:
+        # 用户文本信息
         if isinstance(message, HumanMessage) and isinstance(message.content, str):
-            history_messages.append(HistoryMessageVO(type="human", message=message.content))
+            history_messages.append(
+                HistoryMessageVO(role="human", type="chat", message=message.content)
+            )
+
+        # 用户图片+文本信息
+        if isinstance(message, HumanMessage) and isinstance(message.content, list):
+            # 转换OpenAI格式为自定义格式
+            image_url = ""
+            text_content = ""
+            for item in message.content:  # type: ignore
+                item: dict[str, str] = item
+                if item["type"] == "image_url":
+                    image_url = item["image_url"]
+                if item["type"] == "text":
+                    text_content = item["text"]
+
+            history_messages.append(
+                HistoryMessageVO(
+                    role="human",
+                    type="image",
+                    message={"image_url": image_url, "text": text_content},
+                )
+            )
+
+        # AI文本信息
         if isinstance(message, AIMessage) and isinstance(message.content, str):
-            history_messages.append(HistoryMessageVO(type="chat", message=message.content))
+            history_messages.append(
+                HistoryMessageVO(role="ai", type="chat", message=message.content)
+            )
+
+        # AI非纯文本信息
         if isinstance(message, AIMessage) and isinstance(message.content, list):
-            history_messages.append(HistoryMessageVO(type="plan", message=message.content[0]))
+            message_list = message.content
+            # 旅行规划信息
+            if len(message_list) == 1:
+                history_messages.append(
+                    HistoryMessageVO(role="ai", type="plan", message=message.content[0])
+                )
+            # 音频+文本信息
+            if len(message_list) == 2:
+                # 转换OpenAI格式为自定义格式
+                audio_url = ""
+                text_content = ""
+                for item in message_list:  # type: ignore
+                    item: dict[str, str] = item
+                    if item["type"] == "audio_url":
+                        audio_url = item["audio_url"]
+                    if item["type"] == "text":
+                        text_content = item["text"]
+
+                history_messages.append(
+                    HistoryMessageVO(
+                        role="ai",
+                        type="audio",
+                        message={"audio_url": audio_url, "text": text_content},
+                    )
+                )
 
     return history_messages

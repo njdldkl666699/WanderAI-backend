@@ -84,6 +84,7 @@ def get_static_map_url(location: str) -> str:
 PLAN_AGENT_MAX_ITERATIONS = 4
 EXECUTOR_AGENT_MAX_ITERATIONS = 1000
 SUMMARY_AGENT_MAX_ITERATIONS = 4
+TEXT_AGENT_MAX_ITERATIONS = 10
 
 # 接口盒子API配置
 APIHZ_ID = os.getenv("APIHZ_ID")
@@ -98,6 +99,10 @@ def get_search_image_url(word: str) -> str:
 def get_weather_info_url(province: str, city: str) -> str:
     """获取天气信息API URL"""
     return f"https://cn.apihz.cn/api/tianqi/tengxun.php?id={APIHZ_ID}&key={APIHZ_KEY}&province={province}&city={city}"
+
+
+# 语音合成模型
+SPEECH_MODEL = "sambert-zhigui-v1"
 
 
 class LLMConfig(BaseModel):
@@ -171,4 +176,12 @@ VISUAL_CONFIG = LLMConfig(
     api_key=QWEN_API_KEY,
     base_url=QWEN_BASE_URL,
     temperature=None,
+)
+
+# 文本生成LLM配置
+TEXT_CONFIG = LLMConfig(
+    model="qwen-plus",
+    api_key=QWEN_API_KEY,
+    base_url=QWEN_BASE_URL,
+    temperature=0.6,
 )

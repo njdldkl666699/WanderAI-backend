@@ -3,8 +3,8 @@ from langgraph.checkpoint.mysql.asyncmy import AsyncMySaver
 from langgraph.graph.state import CompiledStateGraph
 
 from common.properties import DATABASE_URL
-from server.agent.graph import workflow
-from server.agent.state import TravelPlanState
+from agent.workflow import travel_plan_workflow
+from agent.state import TravelPlanState
 
 
 async def create_travel_plan_graph():
@@ -12,7 +12,7 @@ async def create_travel_plan_graph():
     # 使用 AsyncMySaver 作为检查点存储
     async with AsyncMySaver.from_conn_string(DATABASE_URL) as memory:
         await memory.setup()
-        yield workflow.compile(checkpointer=memory, name="travel_plan_graph")
+        yield travel_plan_workflow.compile(checkpointer=memory, name="travel_plan_graph")
 
 
 async def get_or_create_state(

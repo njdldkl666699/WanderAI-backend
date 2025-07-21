@@ -100,6 +100,7 @@ def take_over_logging():
         logging.getLogger("httpcore.connection").setLevel(logging.INFO)
         logging.getLogger("mcp.client.streamable_http").setLevel(logging.INFO)
         logging.getLogger("langsmith.client").setLevel(logging.INFO)
+        logging.getLogger("dashscope").setLevel(logging.INFO)
 
 
 def create_console_handler():

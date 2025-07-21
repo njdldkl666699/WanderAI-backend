@@ -3,8 +3,8 @@ import json
 from common.database import redis
 from common.log import log
 from model.vo import HotspotVO
-from server.agent.interface import HotspotAgent
-from server.agent.model import Hotspot
+from agent.model import Hotspot
+from server.agent import HotspotAgent
 
 
 async def get_hotspots(refresh: bool) -> list[HotspotVO]:

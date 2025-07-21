@@ -1,6 +1,6 @@
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 
-from server.agent.model import (
+from agent.model import (
     ExecutorResult,
     HotspotsResult,
     IntentResult,

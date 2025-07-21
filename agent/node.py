@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
 
+from click import prompt
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.prebuilt import create_react_agent
 
@@ -8,9 +9,10 @@ from common.properties import (
     EXECUTOR_AGENT_MAX_ITERATIONS,
     PLAN_AGENT_MAX_ITERATIONS,
     SUMMARY_AGENT_MAX_ITERATIONS,
+    TEXT_AGENT_MAX_ITERATIONS,
 )
-from server.agent.llm import executor_llm
-from server.agent.model import (
+from agent.llm import executor_llm
+from agent.model import (
     ExecutorResult,
     FinalOutput,
     IntentResult,
@@ -18,15 +20,21 @@ from server.agent.model import (
     Schedule,
     SummaryResult,
 )
-from server.agent.output_parser import executor_parser, plan_parser, summary_parser
-from server.agent.prompt_template import (
+from agent.output_parser import executor_parser, plan_parser, summary_parser
+from agent.prompt_template import (
     executor_prompt_template,
     planning_prompt_template,
     summary_prompt_template,
+    text_prompt_template,
 )
-from server.agent.runnable import chat_agent, intent_chain, plan_agent, summary_agent
-from server.agent.state import TravelPlanState
-from server.agent.tool import load_amap_mcp_tools, search_tool
+from agent.runnable import chat_agent, intent_chain, plan_agent, summary_agent, text_agent
+from agent.state import TravelGuideState, TravelPlanState
+from agent.tool import load_amap_mcp_tools, search_tool
+from agent.llm import visual_llm
+from agent.prompt_template import visual_prompt
+
+
+######################## 旅游规划图节点
 
 
 def intent_recognition_node(state: TravelPlanState) -> TravelPlanState:
@@ -170,7 +178,7 @@ def summary_node(state: TravelPlanState) -> TravelPlanState:
         state["final_output"] = final_output.model_dump()
 
         # 更新状态，将消息追加到 messages 中
-        state["messages"].append(AIMessage(content=[final_output.model_dump()]))
+        # 在Service层处理
     except Exception as e:
         # 生成默认总结
         log.warning("总结Agent发生错误: ", e, exc_info=e, stack_info=True)
@@ -183,7 +191,6 @@ def summary_node(state: TravelPlanState) -> TravelPlanState:
             },
         }
         print(f"总结生成错误: {e}")
-        # TODO: 生成默认的每日行程安排
 
     return state
 
@@ -212,3 +219,60 @@ def generate_final_output(state: TravelPlanState) -> FinalOutput:
 def should_plan_or_chat(state: TravelPlanState) -> str:
     """根据意图类型决定下一步"""
     return state["intent_type"]
+
+
+###################### 旅游向导图节点
+
+
+def visual_node(state: TravelGuideState) -> TravelGuideState:
+    """视觉模型节点"""
+    response = visual_llm.invoke(
+        [
+            HumanMessage(
+                [
+                    {
+                        "type": "image_url",
+                        "image_url": state["image_url"],
+                    },
+                    {"type": "text", "text": visual_prompt},
+                ]
+            )
+        ]
+    )
+    if isinstance(response.content, str):
+        state["visual_result"] = response.content
+
+    return state
+
+
+def text_node(state: TravelGuideState) -> TravelGuideState:
+    """文本模型节点"""
+    # 格式化提示词
+    text_prompt = text_prompt_template.format(
+        user_input=state["user_input"],
+        visual_result=state["visual_result"],
+        messages=state["messages"],
+    )
+
+    response = text_agent.invoke(
+        {"messages": [HumanMessage(content=text_prompt)]},
+        {"recursion_limit": TEXT_AGENT_MAX_ITERATIONS},
+    )
+    ai_result = response["messages"][-1].content
+    state["text_result"] = ai_result
+
+    # 将所有结果添加到消息历史
+    # 追加用户输入和图片URL
+    # 遵循 OpenAI 的消息格式
+    state["messages"].append(
+        HumanMessage(
+            [
+                {"type": "image_url", "image_url": state["image_url"]},
+                {"type": "text", "text": state["user_input"]},
+            ]
+        )
+    )
+    # 追加文本AI返回的消息
+    # 在Service层处理
+
+    return state

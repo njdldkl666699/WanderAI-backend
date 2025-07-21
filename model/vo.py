@@ -1,4 +1,5 @@
 from datetime import date as Date
+from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
@@ -45,7 +46,8 @@ class HistoryTitleVO(BaseModel):
 class HistoryMessageVO(BaseModel):
     """历史消息VO"""
 
-    type: str = Field(description="消息类型")
+    role: str = Field(description="消息角色", examples=["human", "ai"])
+    type: str = Field(description="消息类型", examples=["chat", "image", "plan", "audio"])
     message: str | dict = Field(description="消息内容")
 
 

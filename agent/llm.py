@@ -7,6 +7,7 @@ from common.properties import (
     INTENT_CONFIG,
     PLAN_CONFIG,
     SUMMARY_CONFIG,
+    TEXT_CONFIG,
     TITLE_CONFIG,
     VISUAL_CONFIG,
 )
@@ -26,3 +27,5 @@ executor_llm = ChatOpenAI(**EXECUTOR_CONFIG.model_dump())
 summary_llm = ChatOpenAI(**SUMMARY_CONFIG.model_dump())
 
 visual_llm = ChatOpenAI(**VISUAL_CONFIG.model_dump())
+
+text_llm = ChatOpenAI(**TEXT_CONFIG.model_dump())
