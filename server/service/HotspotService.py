@@ -1,9 +1,9 @@
 import json
 
+from agent.model import Hotspot
 from common.database import redis
 from common.log import log
 from model.vo import HotspotVO
-from agent.model import Hotspot
 from server.agent import HotspotAgent
 
 

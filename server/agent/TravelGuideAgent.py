@@ -1,7 +1,8 @@
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph.state import CompiledStateGraph
+
 from agent.state import TravelGuideState, TravelPlanState
 from agent.workflow import travel_guide_workflow
-from langgraph.graph.state import CompiledStateGraph
-from langgraph.checkpoint.memory import InMemorySaver
 
 travel_guide_graph = travel_guide_workflow.compile(
     checkpointer=InMemorySaver(), name="travel_guide"

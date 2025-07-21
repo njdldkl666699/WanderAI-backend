@@ -1,4 +1,5 @@
 from langchain_core.messages import BaseMessage
+
 from agent.runnable import title_chain
 
 

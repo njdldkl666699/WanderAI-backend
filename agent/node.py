@@ -1,17 +1,9 @@
 from typing import Any, Dict, List
 
-from click import prompt
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.prebuilt import create_react_agent
 
-from common.log import log
-from common.properties import (
-    EXECUTOR_AGENT_MAX_ITERATIONS,
-    PLAN_AGENT_MAX_ITERATIONS,
-    SUMMARY_AGENT_MAX_ITERATIONS,
-    TEXT_AGENT_MAX_ITERATIONS,
-)
-from agent.llm import executor_llm
+from agent.llm import executor_llm, visual_llm
 from agent.model import (
     ExecutorResult,
     FinalOutput,
@@ -26,13 +18,18 @@ from agent.prompt_template import (
     planning_prompt_template,
     summary_prompt_template,
     text_prompt_template,
+    visual_prompt,
 )
 from agent.runnable import chat_agent, intent_chain, plan_agent, summary_agent, text_agent
 from agent.state import TravelGuideState, TravelPlanState
 from agent.tool import load_amap_mcp_tools, search_tool
-from agent.llm import visual_llm
-from agent.prompt_template import visual_prompt
-
+from common.log import log
+from common.properties import (
+    EXECUTOR_AGENT_MAX_ITERATIONS,
+    PLAN_AGENT_MAX_ITERATIONS,
+    SUMMARY_AGENT_MAX_ITERATIONS,
+    TEXT_AGENT_MAX_ITERATIONS,
+)
 
 ######################## 旅游规划图节点
 

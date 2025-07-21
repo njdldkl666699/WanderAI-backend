@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Query
-from model.result import Result
-from common.log import log
-from server.service import HotspotService
 
+from common.log import log
+from model.result import Result
+from server.service import HotspotService
 
 router = APIRouter(prefix="/hotspot")
 

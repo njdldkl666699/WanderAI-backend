@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from model.dto import SuggestionDTO
+
 from common.log import log
+from model.dto import SuggestionDTO
 from model.result import Result
 from server.service import SuggestionService
 

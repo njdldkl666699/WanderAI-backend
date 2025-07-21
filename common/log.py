@@ -1,8 +1,8 @@
 import atexit
-from datetime import datetime
+import copy
 import logging
 import sys
-import copy
+from datetime import datetime
 
 from common.properties import LOG_DATEFMT, LOG_FILE_PREFIX, LOG_FORMAT, LOG_LEVEL
 

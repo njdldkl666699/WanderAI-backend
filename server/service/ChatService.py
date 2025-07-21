@@ -7,6 +7,7 @@ from langchain_core.messages import AIMessage, AIMessageChunk
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
 
+from agent.model import AttractionStaticMap, ExecutorResult
 from agent.state import TravelPlanState
 from common.constant import MessageConstant
 from common.context import BaseContext
@@ -18,7 +19,6 @@ from model.dto import ChatMessageDTO
 from model.entity import UserHistory
 from model.result import StreamResult
 from model.vo import CreateSessionVO, Weather, WeatherVO
-from agent.model import AttractionStaticMap, ExecutorResult
 from server.agent import TravelChatAgent
 from server.mapper import UserHistoryMapper
 

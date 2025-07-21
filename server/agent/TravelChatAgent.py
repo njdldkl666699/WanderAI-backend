@@ -2,9 +2,9 @@ from langchain_core.messages import BaseMessage
 from langgraph.checkpoint.mysql.asyncmy import AsyncMySaver
 from langgraph.graph.state import CompiledStateGraph
 
-from common.properties import DATABASE_URL
-from agent.workflow import travel_plan_workflow
 from agent.state import TravelPlanState
+from agent.workflow import travel_plan_workflow
+from common.properties import DATABASE_URL
 
 
 async def create_travel_plan_graph():

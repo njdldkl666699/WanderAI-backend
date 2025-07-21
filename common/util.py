@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 from typing import Any
 
-from jose import jwt
 import alibabacloud_oss_v2 as oss
-from common.log import log
+from jose import jwt
 
 from common.constant import JwtConstant
+from common.log import log
 from common.properties import (
     JWT_ALGORITHM,
     JWT_SECRET_KEY,

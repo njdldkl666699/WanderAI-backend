@@ -1,4 +1,5 @@
-from typing import Any, Literal, AsyncGenerator
+from typing import Any, AsyncGenerator, Literal
+
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 

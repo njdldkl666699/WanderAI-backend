@@ -13,7 +13,6 @@ from agent.llm import (
 from agent.output_parser import intent_parser, title_parser
 from agent.prompt_template import (
     intent_prompt_template,
-    text_prompt_template,
     title_prompt_template,
 )
 from agent.tool import calculator, load_amap_mcp_tools, search_tool

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Query
+
 from common.log import log
 from model.result import Result
 from server.service import HistoryService

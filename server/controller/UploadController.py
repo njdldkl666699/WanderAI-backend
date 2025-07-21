@@ -1,5 +1,7 @@
 import uuid
+
 from fastapi import APIRouter, UploadFile
+
 from common.constant import MessageConstant
 from common.log import log
 from common.util import AliOssUtil
