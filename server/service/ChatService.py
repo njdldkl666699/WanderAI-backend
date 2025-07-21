@@ -112,10 +112,13 @@ async def travel_plan_or_chat(
                 if isinstance(final_output, str):
                     # chat输出
                     log.info(f"最终输出：{final_output}")
+
                 if isinstance(final_output, dict):
                     # 旅行规划输出
                     (province, city) = set_attraction_maps(final_output)
                     final_output["weather_vo"] = get_weather(province, city).model_dump()
+                    # 更新state
+                    final_state.values["final_output"] = final_output
                     log.info(f"最终输出：{final_output.keys()}")
 
                 all_result = StreamResult.all(final_output)

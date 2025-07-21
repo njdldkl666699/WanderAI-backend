@@ -8,6 +8,7 @@ from common.properties import (
     PLAN_CONFIG,
     SUMMARY_CONFIG,
     TITLE_CONFIG,
+    VISUAL_CONFIG,
 )
 
 hotspot_llm = ChatOpenAI(**HOTSPOT_CONFIG.model_dump())
@@ -24,4 +25,4 @@ executor_llm = ChatOpenAI(**EXECUTOR_CONFIG.model_dump())
 
 summary_llm = ChatOpenAI(**SUMMARY_CONFIG.model_dump())
 
-visual_llm = ChatOpenAI(**CHAT_CONFIG.model_dump())
+visual_llm = ChatOpenAI(**VISUAL_CONFIG.model_dump())
