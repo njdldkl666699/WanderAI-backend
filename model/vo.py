@@ -18,6 +18,22 @@ class UserLoginVO(BaseModel):
     token: str = Field(description="用户令牌")
     nickname: str = Field(description="用户昵称")
 
+class AdminLoginVO(BaseModel):
+    """管理员登录VO"""
+    token: str = Field(description="管理员令牌")
+
+
+class UserAccountVO(BaseModel):
+    """管理员查找用户账号VO"""
+    account_id: str = Field(description="用户账号ID")
+    nickname: str = Field(description="用户昵称")
+
+
+class SuggestionVO(BaseModel):
+    """用户建议VO"""
+    account_id: str = Field(description="用户账号ID")
+    message: str = Field(description="用户建议")
+
 
 class CreateSessionVO(BaseModel):
     """创建会话VO"""

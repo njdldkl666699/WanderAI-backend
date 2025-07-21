@@ -13,6 +13,13 @@ class UserModel(Base):
     nickname = Column(VARCHAR(20), nullable=False)
     password = Column(VARCHAR(255), nullable=False)
 
+class AdminModel(Base):
+    """管理员模型"""
+
+    __tablename__ = "admin"
+
+    admin_id = Column(VARCHAR(10), primary_key=True)
+    password = Column(VARCHAR(255), nullable=False)
 
 class UserHistoryModel(Base):
     """用户历史会话模型"""

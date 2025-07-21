@@ -13,6 +13,8 @@ class UserNotFoundException(AppException):
 class UserAlreadyExistsException(AppException):
     """用户已存在异常"""
 
+class AdminNotFoundException(AppException):
+    """管理员未找到异常"""
 
 class PasswordErrorException(AppException):
     """密码错误异常"""
