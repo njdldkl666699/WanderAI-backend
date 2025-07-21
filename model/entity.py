@@ -35,7 +35,7 @@ class UserHistory(BaseModel):
 class Suggestion(BaseModel):
     """用户建议模型"""
 
-    id: int | None = Field(None, description="建议ID")
+    id: int |None = Field(None,description="建议ID")
     account_id: str = Field(description="用户账号ID")
     message: str = Field(description="建议内容")
 

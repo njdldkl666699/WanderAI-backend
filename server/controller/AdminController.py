@@ -39,7 +39,7 @@ async def get_suggestion(getSuggestionDTO:GetSuggestionDTO):
     suggestion = await AdminService.get_suggestion(getSuggestionDTO)
     return Result.success(suggestion)
 
-@router.get("/getSuggestion")
+@router.get("/getAllSuggestion")
 async def get_all_suggestion():
     """查找所有用户建议"""
     suggestion = await AdminService.get_all_suggestion()

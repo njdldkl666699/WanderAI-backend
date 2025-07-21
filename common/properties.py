@@ -62,6 +62,9 @@ WHITELIST_PATHS: Set[str] = {
     "/api/admin/getSuggestion",
     "/api/admin/getUsers",
     "/api/admin/deleteAccount",
+    "/api/admin/deleteSuggestion",
+    "/api/admin/getAllSuggestion",
+    "/api/admin/getAccount",
 }
 
 

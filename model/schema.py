@@ -37,6 +37,6 @@ class SuggestionModel(Base):
 
     __tablename__ = "suggestion"
 
-    id = Column(INT, primary_key=True, autoincrement=True)
+    id = Column(INT, primary_key=True, autoincrement=True,nullable=False)
     account_id = Column(VARCHAR(10), nullable=False)
     message = Column(TEXT)

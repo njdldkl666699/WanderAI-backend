@@ -31,6 +31,10 @@ class UserAccountVO(BaseModel):
 
 class SuggestionVO(BaseModel):
     """用户建议VO"""
+
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+
+    id: int= Field(description="用户建议ID")
     account_id: str = Field(description="用户账号ID")
     message: str = Field(description="用户建议")
 
