@@ -36,6 +36,18 @@ class GetSuggestionDTO(BaseModel):
     account_id: str = Field(description="待查找建议的用户账号")
 
 
+class DeleteSuggestionDTO(BaseModel):
+    """删除用户建议DTO"""
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+    id: int = Field(description="待删除的用户建议ID")
+
+
+class GetAccountDTO(BaseModel):
+    """查找具体用户DTO"""
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+    account_id: str = Field(description="待查找的用户账号")
+
+
 class ChatMessageDTO(BaseModel):
     """用户发送的消息DTO"""
 

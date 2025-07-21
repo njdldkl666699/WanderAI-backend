@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
 from common.log import log
-from model.dto import AdminLoginDTO,DeleteAccountDTO,GetSuggestionDTO
+from model.dto import AdminLoginDTO,DeleteAccountDTO,GetSuggestionDTO,DeleteSuggestionDTO,GetAccountDTO
 from model.result import Result
 from server.service import AdminService
 
@@ -21,6 +21,12 @@ async def get_users():
     users = await AdminService.list_users()
     return Result.success(users)
 
+@router.get("/getAccount")
+async def get_account(getAccountDTO:GetAccountDTO):
+    """查找某个用户账号和昵称"""
+    user = await AdminService.get_acount(getAccountDTO)
+    return Result.success(user)
+
 @router.delete("/deleteAccount")
 async def delete_account(deleteAccountDTO:DeleteAccountDTO):
     """注销账户"""
@@ -33,4 +39,15 @@ async def get_suggestion(getSuggestionDTO:GetSuggestionDTO):
     suggestion = await AdminService.get_suggestion(getSuggestionDTO)
     return Result.success(suggestion)
 
+@router.get("/getSuggestion")
+async def get_all_suggestion():
+    """查找所有用户建议"""
+    suggestion = await AdminService.get_all_suggestion()
+    return Result.success(suggestion)
+
+@router.delete("/deleteSuggestion")
+async def delete_suggestion(deleteSuggestionDTO:DeleteSuggestionDTO):
+    """删除用户建议"""
+    await AdminService.delete_suggestion(deleteSuggestionDTO)
+    return Result.success()
     

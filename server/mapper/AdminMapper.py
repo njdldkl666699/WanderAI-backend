@@ -13,6 +13,13 @@ async def list_users() -> list[User]:
     results = result.scalars().all()
     return [User.model_validate(user) for user in results]
 
+async def get_account(account_id:str) -> User:
+    """查找具体用户"""
+    db = BaseContext.get_db_session()
+    stmt = select(UserModel).where(UserModel.account_id==account_id)
+    result = await db.execute(stmt)
+    return User.model_validate(result)
+
 async def get_admin_by_admin_id(admin_id: str) -> Admin | None:
     """通过管理员ID获取管理员"""
     db = BaseContext.get_db_session()
@@ -39,5 +46,18 @@ async def get_suggestion(account_id:str) -> list[Suggestion]:
     results = result.scalars().all()
     return [Suggestion.model_validate(suggestion)for suggestion in results]
 
-    
+async def get_all_suggestion() -> list[Suggestion]:
+    """查找所有用户建议"""
+    db = BaseContext.get_db_session()
+    stmt = select(SuggestionModel)
+    result = await db.execute(stmt)
+    results = result.scalars().all()
+    return [Suggestion.model_validate(suggestion)for suggestion in results]
+
+
+async def delete_suggestion(id:int):
+    """删除建议"""
+    db = BaseContext.get_db_session()
+    stmt = delete(SuggestionModel).where(SuggestionModel.id==id)
+    await db.execute(stmt)
 
