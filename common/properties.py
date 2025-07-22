@@ -58,6 +58,13 @@ WHITELIST_PATHS: Set[str] = {
     "/openapi.json",
     "/favicon.ico",
     "/health",
+    "/api/admin/login",
+    "/api/admin/getSuggestion",
+    "/api/admin/getUsers",
+    "/api/admin/deleteAccount",
+    "/api/admin/deleteSuggestion",
+    "/api/admin/getAllSuggestion",
+    "/api/admin/getAccount",
 }
 
 

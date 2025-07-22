@@ -11,6 +11,7 @@ from server.controller import (
     SuggestionController,
     UploadController,
     UserController,
+    AdminController,
 )
 from server.handler import setup_exception_handler
 from server.interceptor import setup_middlewares
@@ -46,6 +47,7 @@ api_router.include_router(ChatController.router)
 api_router.include_router(HotspotController.router)
 api_router.include_router(HistoryController.router)
 api_router.include_router(SuggestionController.router)
+api_router.include_router(AdminController.router)
 api_router.include_router(UploadController.router)
 
 app.include_router(api_router)

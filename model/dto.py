@@ -17,6 +17,36 @@ class UserLoginDTO(BaseModel):
     account_id: str = Field(description="用户名")
     password: str = Field(description="用户密码")
 
+class AdminLoginDTO(BaseModel):
+    """管理员登录DTO"""
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+
+    admin_id: str = Field(description="管理员ID")
+    password: str = Field(description="管理员密码")
+
+class DeleteAccountDTO(BaseModel):
+    """注销用户DTO"""
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+    account_id: str = Field(description="待注销的用户账号")
+
+
+# class GetSuggestionDTO(BaseModel):
+#     """查找用户建议DTO"""
+#     model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+#     account_id: str = Field(description="待查找建议的用户账号")
+
+
+class DeleteSuggestionDTO(BaseModel):
+    """删除用户建议DTO"""
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+    id: int = Field(description="待删除的用户建议ID")
+
+
+# class GetAccountDTO(BaseModel):
+#     """查找具体用户DTO"""
+#     model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+#     account_id: str = Field(description="待查找的用户账号")
+
 
 class ChatMessageDTO(BaseModel):
     """用户发送的消息DTO"""

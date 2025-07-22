@@ -11,6 +11,14 @@ class User(BaseModel):
     class Config:
         from_attributes = True  # 允许从ORM对象创建
 
+class Admin(BaseModel):
+    """管理员模型"""
+
+    admin_id: str = Field(description="管理员ID")
+    password: str = Field(description="管理员密码")
+
+    class Config:
+        from_attributes = True  # 允许从ORM对象创建
 
 class UserHistory(BaseModel):
     """用户历史会话模型"""
@@ -27,7 +35,7 @@ class UserHistory(BaseModel):
 class Suggestion(BaseModel):
     """用户建议模型"""
 
-    id: int | None = Field(None, description="建议ID")
+    id: int |None = Field(None,description="建议ID")
     account_id: str = Field(description="用户账号ID")
     message: str = Field(description="建议内容")
 

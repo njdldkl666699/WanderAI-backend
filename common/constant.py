@@ -1,6 +1,6 @@
 class JwtConstant:
     """JWT常量类"""
-
+    ASMIN_ID = "admin_id"
     ACCOUNT_ID = "account_id"
     EXPIRATION = "exp"
 
@@ -9,6 +9,7 @@ class MessageConstant:
     """消息常量类"""
 
     USER_NOT_FOUND = "用户未找到"
+    ADMIN_NOT_FOUND = "管理员未找到"
     USER_ALREADY_EXISTS = "用户已存在"
     PASSWORD_ERROR = "密码错误"
     PLEASE_LOGIN = "请先登录"
