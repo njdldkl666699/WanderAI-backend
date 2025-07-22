@@ -125,6 +125,7 @@ async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessage
                     history_messages.append(
                         HistoryMessageVO(role="ai", type="plan", message=final_output)
                     )
+
             # 音频+文本信息
             if len(message_list) == 2:
                 # 转换OpenAI格式为自定义格式

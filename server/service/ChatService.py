@@ -1,13 +1,13 @@
-import json
 import uuid
 from datetime import date, timedelta
 from typing import Any, AsyncGenerator, Dict, List, Tuple
 
 import requests
-from langchain_core.messages import AIMessage, AIMessageChunk
+from langchain_core.messages import AIMessageChunk
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
 
+from agent.message import AIPlanMessage
 from agent.model import AttractionStaticMap, ExecutorResult
 from agent.state import TravelPlanState
 from common.constant import MessageConstant
@@ -102,14 +102,16 @@ async def travel_plan_or_chat(
                         # 如果父节点是聊天节点且子节点不是工具节点，
                         # 直接输出流式聊天消息
                         content: str = message_chunk.content  # type: ignore
-                        print(content)
+                        print(content, end="", flush=True)
                         chat_result = StreamResult.chat(content)
                         yield chat_result.to_sse_format()
 
             # 生成最终状态并输出
             final_output = await create_final_output(graph, session_id)
-            all_result = StreamResult.all(final_output)
-            yield all_result.to_sse_format()
+            if isinstance(final_output, dict):
+                # 结果为旅行计划时输出
+                all_result = StreamResult.all(final_output)
+                yield all_result.to_sse_format()
 
         # 结束标识
         log.info("流式对话结束")
@@ -125,7 +127,7 @@ async def travel_plan_or_chat(
 async def create_final_output(
     graph: CompiledStateGraph[TravelPlanState, TravelPlanState, TravelPlanState], session_id: str
 ) -> dict[str, Any] | str:
-    """创建最终的旅行计划输出"""
+    """创建最终输出，旅行计划或聊天消息"""
     final_state = await graph.aget_state({"configurable": {"thread_id": session_id}})
 
     if not final_state or not final_state.values:
@@ -147,9 +149,7 @@ async def create_final_output(
         final_state.values["final_output"] = final_output
         # 将消息追加到 messages 中
         # OpenAI 格式
-        final_state.values["messages"].append(
-            AIMessage([{"type": "text", "text": json.dumps(final_output)}])
-        )
+        final_state.values["messages"].append(AIPlanMessage(final_output))
         # 更新状态节点（保存到检查点）
         await graph.aupdate_state(
             config={"configurable": {"thread_id": session_id}},

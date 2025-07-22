@@ -1,10 +1,10 @@
 import uuid
 from typing import Any
 
-from langchain_core.messages import AIMessage, AIMessageChunk
+from langchain_core.messages import AIMessageChunk
 from langgraph.graph.state import CompiledStateGraph
 
-from agent.runnable import generate_audio_from_text
+from agent.message import AIAudioMessage
 from agent.state import TravelPlanState
 from common.constant import MessageConstant
 from common.exception import MessageListEmptyException
@@ -13,7 +13,7 @@ from common.util import AliOssUtil
 from model.dto import GuideMessageDTO
 from model.result import StreamResult
 from server.agent import TravelChatAgent, TravelGuideAgent
-from server.agent.TravelGuideAgent import travel_guide_graph
+from server.agent.TravelGuideAgent import generate_audio_from_text, travel_guide_graph
 
 
 async def travel_guide(guide_message_dto: GuideMessageDTO, session_id: str):
@@ -88,14 +88,7 @@ async def create_audio_output(
     audio_url = AliOssUtil.put_object(audio_name, audio_data)
 
     # 将音频URL添加到旅行导游状态
-    final_state.values["messages"].append(
-        AIMessage(
-            [
-                {"type": "audio_url", "audio_url": audio_url},
-                {"type": "text", "text": text_result},
-            ]
-        )
-    )
+    final_state.values["messages"].append(AIAudioMessage(audio_url, text_result))
 
     # 更新旅行计划图状态的历史消息
     plan_state = await TravelChatAgent.get_or_create_state(graph, "", session_id)

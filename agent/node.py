@@ -4,6 +4,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.prebuilt import create_react_agent
 
 from agent.llm import executor_llm, visual_llm
+from agent.message import HumanImageMessage
 from agent.model import (
     ExecutorResult,
     FinalOutput,
@@ -223,19 +224,10 @@ def should_plan_or_chat(state: TravelPlanState) -> str:
 
 def visual_node(state: TravelGuideState) -> TravelGuideState:
     """视觉模型节点"""
-    response = visual_llm.invoke(
-        [
-            HumanMessage(
-                [
-                    {
-                        "type": "image_url",
-                        "image_url": state["image_url"],
-                    },
-                    {"type": "text", "text": visual_prompt},
-                ]
-            )
-        ]
-    )
+    # 历史消息追加用户输入和图片URL
+    state["messages"].append(HumanImageMessage(state["image_url"], state["user_input"]))
+    messages = state["messages"] + [HumanImageMessage(state["image_url"], visual_prompt)]
+    response = visual_llm.invoke(messages)
     if isinstance(response.content, str):
         state["visual_result"] = response.content
 
@@ -258,17 +250,6 @@ def text_node(state: TravelGuideState) -> TravelGuideState:
     ai_result = response["messages"][-1].content
     state["text_result"] = ai_result
 
-    # 将所有结果添加到消息历史
-    # 追加用户输入和图片URL
-    # 遵循 OpenAI 的消息格式
-    state["messages"].append(
-        HumanMessage(
-            [
-                {"type": "image_url", "image_url": state["image_url"]},
-                {"type": "text", "text": state["user_input"]},
-            ]
-        )
-    )
     # 追加文本AI返回的消息
     # 在Service层处理
 

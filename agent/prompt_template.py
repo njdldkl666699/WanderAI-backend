@@ -1,6 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate
 
-
 # 热门景点推荐提示词模板
 hotspot_prompt_template = ChatPromptTemplate.from_template(
     """

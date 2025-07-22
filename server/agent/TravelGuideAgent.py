@@ -1,8 +1,10 @@
+from dashscope.audio.tts import SpeechSynthesizer
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph.state import CompiledStateGraph
 
 from agent.state import TravelGuideState, TravelPlanState
 from agent.workflow import travel_guide_workflow
+from common.properties import SPEECH_MODEL
 
 travel_guide_graph = travel_guide_workflow.compile(
     checkpointer=InMemorySaver(), name="travel_guide"
@@ -38,3 +40,9 @@ async def get_or_create_state(
         text_result="",
         messages=[],
     )
+
+
+def generate_audio_from_text(text: str) -> bytes:
+    """从文本生成音频"""
+    audio_result = SpeechSynthesizer.call(model=SPEECH_MODEL, text=text)
+    return audio_result.get_audio_data()

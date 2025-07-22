@@ -168,7 +168,7 @@ SUMMARY_CONFIG = LLMConfig(
 
 # 图像理解LLM配置
 VISUAL_CONFIG = LLMConfig(
-    model="qwen-vl-plus",
+    model="qwen-vl-max",
     api_key=QWEN_API_KEY,
     base_url=QWEN_BASE_URL,
     temperature=None,
