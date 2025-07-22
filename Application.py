@@ -15,4 +15,5 @@ if __name__ == "__main__":
         reload=False,  # 调试时禁用热重载
         log_config=None,  # 禁用 uvicorn 默认日志配置
         access_log=True,  # 启用访问日志
+        timeout_keep_alive=120,  # 设置连接保持活动的超时时间
     )

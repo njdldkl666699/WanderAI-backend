@@ -1,3 +1,4 @@
+import json
 import uuid
 from datetime import date, timedelta
 from typing import Any, AsyncGenerator, Dict, List, Tuple
@@ -116,7 +117,7 @@ async def travel_plan_or_chat(
         yield end_result.to_sse_format()
 
     except Exception as e:
-        log.error(f"流式对话出错: {e}")
+        log.error(f"流式对话出错: {e}", exc_info=e)
         error_result = StreamResult.error(f"流式对话出错: {str(e)}")
         yield error_result.to_sse_format()
 
@@ -145,7 +146,10 @@ async def create_final_output(
         # 更新state的final_output
         final_state.values["final_output"] = final_output
         # 将消息追加到 messages 中
-        final_state.values["messages"].append(AIMessage([final_output]))
+        # OpenAI 格式
+        final_state.values["messages"].append(
+            AIMessage([{"type": "text", "text": json.dumps(final_output)}])
+        )
         # 更新状态节点（保存到检查点）
         await graph.aupdate_state(
             config={"configurable": {"thread_id": session_id}},
@@ -279,7 +283,7 @@ def get_weather(province: str, city: str) -> WeatherVO:
         if weather["time"] == current_date.strftime("%Y-%m-%d"):
             weathers.append(
                 Weather(
-                    date=current_date,
+                    date=weather["time"],
                     max_degree=weather["max_degree"],
                     min_degree=weather["min_degree"],
                     day_weather=weather["day_weather"],

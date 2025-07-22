@@ -1,5 +1,3 @@
-from datetime import date as Date
-
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
@@ -64,7 +62,7 @@ class Weather(BaseModel):
 
     model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
 
-    date: Date = Field(description="日期")
+    date: str = Field(description="日期")
     max_degree: str = Field(description="最高温度")
     min_degree: str = Field(description="最低温度")
     day_weather: str = Field(description="白天天气")

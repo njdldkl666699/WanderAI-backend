@@ -1,3 +1,5 @@
+import json
+from typing import Any
 from langchain_core.messages import AIMessage, HumanMessage
 
 from common.constant import MessageConstant
@@ -115,9 +117,13 @@ async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessage
             message_list = message.content
             # 旅行规划信息
             if len(message_list) == 1:
-                history_messages.append(
-                    HistoryMessageVO(role="ai", type="plan", message=message.content[0])
-                )
+                # 转换OpenAI格式为自定义格式
+                content: dict[str, Any] = message.content[0]  # type: ignore
+                if content["type"] == "text":
+                    final_output: dict[str, Any] = json.loads(content["text"])
+                    history_messages.append(
+                        HistoryMessageVO(role="ai", type="plan", message=final_output)
+                    )
             # 音频+文本信息
             if len(message_list) == 2:
                 # 转换OpenAI格式为自定义格式

@@ -179,7 +179,7 @@ executor_prompt_template = ChatPromptTemplate.from_template(
 
 ### 1. 景点信息收集
 对每个景点获取或者生成以下信息：
-- 地址信息和经纬度坐标
+- 地址信息，文字格式的结构化地址
 - 景点介绍（150字左右）
 
 ### 2. 路线安排
@@ -212,7 +212,7 @@ executor_prompt_template = ChatPromptTemplate.from_template(
     {{
       "attraction": "string",  // 景点名
       "address": "string",  // 地址信息
-      "coordinates": "string",  // 经纬度信息，格式为：经度, 纬度
+      "coordinates": "string",  // 经纬度信息，保留字段，请不要填充
       "introduction": "string"  // 景点介绍
     }}
   ],
@@ -238,9 +238,10 @@ executor_prompt_template = ChatPromptTemplate.from_template(
     }}
   ],
   "attraction_details": [
-    "景点A": {{
+    {{
+      "attraction": "景点A",
       "address": "xx市xx区xx街道xx号",
-      "coordinates": "100.087721, 99.103042",
+      "coordinates": "",    // 经纬度信息，保留字段，请不要填充
       "introduction": "历史悠久，环境优美的热门打卡地"
     }}
   ],

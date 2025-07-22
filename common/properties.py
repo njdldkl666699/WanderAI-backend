@@ -62,7 +62,7 @@ WHITELIST_PATHS: Set[str] = {
 
 
 # 大模型配置
-QWEN_API_KEY = SecretStr(os.getenv("QWEN_API_KEY", ""))
+QWEN_API_KEY = SecretStr(os.getenv("DASHSCOPE_API_KEY", ""))
 QWEN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
 # 地图API配置
@@ -116,7 +116,7 @@ class LLMConfig(BaseModel):
 
 # 热门景点LLM配置
 HOTSPOT_CONFIG = LLMConfig(
-    model="qwen-plus",
+    model="qwen-plus-latest",
     api_key=QWEN_API_KEY,
     base_url=QWEN_BASE_URL,
     temperature=0.3,
@@ -156,7 +156,7 @@ PLAN_CONFIG = LLMConfig(
 
 # 每日规划LLM配置
 EXECUTOR_CONFIG = LLMConfig(
-    model="qwen-max",
+    model="qwen-max-latest",
     api_key=QWEN_API_KEY,
     base_url=QWEN_BASE_URL,
     temperature=0.2,
