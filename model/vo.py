@@ -25,6 +25,8 @@ class AdminLoginVO(BaseModel):
 
 class UserAccountVO(BaseModel):
     """管理员查找用户账号VO"""
+    model_config = ConfigDict(alias_generator=to_camel, validate_by_name=True)
+
     account_id: str = Field(description="用户账号ID")
     nickname: str = Field(description="用户昵称")
 

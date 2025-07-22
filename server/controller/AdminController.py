@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query,Path
 
 from common.log import log
-from model.dto import AdminLoginDTO,DeleteAccountDTO,GetSuggestionDTO,DeleteSuggestionDTO,GetAccountDTO
+from model.dto import AdminLoginDTO,DeleteAccountDTO,DeleteSuggestionDTO
 from model.result import Result
 from server.service import AdminService
 
@@ -22,9 +22,9 @@ async def get_users():
     return Result.success(users)
 
 @router.get("/getAccount")
-async def get_account(getAccountDTO:GetAccountDTO):
+async def get_account(account_id: str = Query(None, description="用户账号",alias="accountId")):
     """查找某个用户账号和昵称"""
-    user = await AdminService.get_acount(getAccountDTO)
+    user = await AdminService.get_acount(account_id)
     return Result.success(user)
 
 @router.delete("/deleteAccount")
@@ -34,9 +34,9 @@ async def delete_account(deleteAccountDTO:DeleteAccountDTO):
     return Result.success()
 
 @router.get("/getSuggestion")
-async def get_suggestion(getSuggestionDTO:GetSuggestionDTO):
+async def get_suggestion(account_id: str = Query(None, description="用户账号",alias="accountId")):
     """查找用户建议"""
-    suggestion = await AdminService.get_suggestion(getSuggestionDTO)
+    suggestion = await AdminService.get_suggestion(account_id)
     return Result.success(suggestion)
 
 @router.get("/getAllSuggestion")

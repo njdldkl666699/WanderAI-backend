@@ -1,7 +1,7 @@
 from sqlalchemy import select, delete
 
 from common.context import BaseContext
-from model.entity import Admin,User,Suggestion
+from model.entity import Admin,User
 from model.schema import AdminModel,UserModel,SuggestionModel,UserHistoryModel
 
 
@@ -18,7 +18,8 @@ async def get_account(account_id:str) -> User:
     db = BaseContext.get_db_session()
     stmt = select(UserModel).where(UserModel.account_id==account_id)
     result = await db.execute(stmt)
-    return User.model_validate(result)
+    dmin_model = result.scalar_one_or_none()
+    return User.model_validate(dmin_model)
 
 async def get_admin_by_admin_id(admin_id: str) -> Admin | None:
     """通过管理员ID获取管理员"""

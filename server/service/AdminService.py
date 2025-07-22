@@ -1,7 +1,7 @@
 from common.constant import JwtConstant, MessageConstant
 from common.exception import PasswordErrorException, AdminNotFoundException
 from common.util import JwtUtil
-from model.dto import AdminLoginDTO,DeleteAccountDTO,GetSuggestionDTO,DeleteSuggestionDTO,GetAccountDTO
+from model.dto import AdminLoginDTO,DeleteAccountDTO,DeleteSuggestionDTO
 from model.vo import AdminLoginVO,UserAccountVO,SuggestionVO
 from server.mapper import AdminMapper,SuggestionMapper
 
@@ -32,9 +32,8 @@ async def list_users() -> list[UserAccountVO]:
     users = await AdminMapper.list_users()
     return [UserAccountVO(account_id = user.account_id,nickname = user.nickname) for user in users]
 
-async def get_acount(getAccountDTO:GetAccountDTO) ->UserAccountVO:
+async def get_acount(account_id) ->UserAccountVO:
     """查找具体用户"""
-    account_id = getAccountDTO.account_id
     user = await AdminMapper.get_account(account_id)
     return UserAccountVO(account_id = user.account_id,nickname = user.nickname)
 
@@ -43,9 +42,8 @@ async def delete_account(deleteAccountDTO: DeleteAccountDTO):
     account_id = deleteAccountDTO.account_id
     await AdminMapper.delete_account(account_id)
 
-async def get_suggestion(getSuggestion:GetSuggestionDTO) -> list[SuggestionVO]:
+async def get_suggestion(account_id:str) -> list[SuggestionVO]:
     """查找用户建议"""
-    account_id=getSuggestion.account_id
     suggestion = await SuggestionMapper.get_suggestion(account_id)
     return [SuggestionVO(id=suggest.id,account_id=suggest.account_id,message=suggest.message)for suggest in suggestion] # type: ignore
 
