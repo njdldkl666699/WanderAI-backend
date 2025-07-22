@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete
+from sqlalchemy import delete, select
 
 from common.context import BaseContext
 from model.entity import Suggestion

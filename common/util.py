@@ -4,7 +4,8 @@ from typing import Any
 import alibabacloud_oss_v2 as oss
 from jose import jwt
 
-from common.constant import JwtConstant
+from common.constant import JwtConstant, MessageConstant
+from common.exception import UnauthorizedException
 from common.log import log
 from common.properties import (
     JWT_ALGORITHM,
@@ -32,17 +33,17 @@ class JwtUtil:
         return encoded_jwt
 
     @staticmethod
-    def parse_JWT(token: str) -> dict[str, Any] | None:
+    def parse_JWT(token: str) -> dict[str, Any]:
         """解析访问令牌"""
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
 
-        exp = payload.get(JwtConstant.EXPIRATION)
+        exp = payload.get(JwtConstant.EXPIRATION, "")
         if exp is None:
             # 如果没有过期时间，令牌无效
-            return None
+            raise UnauthorizedException(MessageConstant.JWT_INVALID_OR_EXPIRED)
         if datetime.fromtimestamp(exp) < datetime.now():
             # 如果当前时间超过过期时间，令牌无效
-            return None
+            raise UnauthorizedException(MessageConstant.JWT_INVALID_OR_EXPIRED)
 
         return payload
 

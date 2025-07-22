@@ -1,5 +1,4 @@
 import os
-from typing import Set
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, SecretStr
@@ -49,24 +48,14 @@ JWT_TTL_MINUTES = int(os.getenv("JWT_TTL_MINUTES", "300"))
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_TOKEN_NAME = os.getenv("JWT_TOKEN_NAME", "Authentication")  # JWT令牌名称
 
-# JWT校验白名单
-WHITELIST_PATHS: Set[str] = {
-    "/api/user/login",
-    "/api/user/register",
+# JWT不校验的资源路径
+RESOURCE_PATHS: list[str] = [
     "/docs",
     "/redoc",
     "/openapi.json",
     "/favicon.ico",
     "/health",
-    "/api/admin/login",
-    "/api/admin/getSuggestion",
-    "/api/admin/getUsers",
-    "/api/admin/deleteAccount",
-    "/api/admin/deleteSuggestion",
-    "/api/admin/getAllSuggestion",
-    "/api/admin/getAccount",
-}
-
+]
 
 # 大模型配置
 QWEN_API_KEY = SecretStr(os.getenv("DASHSCOPE_API_KEY", ""))

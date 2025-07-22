@@ -1,6 +1,7 @@
 class JwtConstant:
     """JWT常量类"""
-    ASMIN_ID = "admin_id"
+
+    ADMIN_ID = "admin_id"
     ACCOUNT_ID = "account_id"
     EXPIRATION = "exp"
 
