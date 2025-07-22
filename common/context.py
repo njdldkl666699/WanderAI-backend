@@ -8,7 +8,7 @@ admin_id_context: ContextVar[str] = ContextVar("admin_id")
 
 
 class BaseContext:
-    """应用上下文管理器"""
+    """会话上下文管理器"""
 
     # 数据库会话
     @staticmethod

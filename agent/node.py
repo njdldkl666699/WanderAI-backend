@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
 from langgraph.prebuilt import create_react_agent
 
 from agent.llm import executor_llm, visual_llm
@@ -226,7 +226,17 @@ def visual_node(state: TravelGuideState) -> TravelGuideState:
     """视觉模型节点"""
     # 历史消息追加用户输入和图片URL
     state["messages"].append(HumanImageMessage(state["image_url"], state["user_input"]))
-    messages = state["messages"] + [HumanImageMessage(state["image_url"], visual_prompt)]
+
+    messages: list[BaseMessage] = []
+    for message in state["messages"]:
+        # 如果是AI音频+文本消息，则跳过
+        if isinstance(message, AIMessage) and isinstance(message.content, list):
+            if len(message.content) == 2:
+                continue
+
+        messages.append(message)
+
+    messages.append(HumanImageMessage(state["image_url"], visual_prompt))
     response = visual_llm.invoke(messages)
     if isinstance(response.content, str):
         state["visual_result"] = response.content
