@@ -10,72 +10,84 @@
 WanderAI-backend
 │   .env						# 环境配置
 │   .gitignore					# .gitignore文件
-│   Application.py				# 项目启动入口
+│   LICENSE.md                  # 许可证
+│   pyproject.toml				# Python项目配置
 │   README.md					# README
-│   requirements.txt			# 项目依赖
+│   wander_ai.sql               # 数据库脚本
 │
-├───agent						# Agent模块
-│       llm.py					# 大模型实例对象
-│       message.py				# 自定义消息类
-│       model.py				# Pydantic模型类
-│       node.py					# LangGraph节点函数
-│       output_parser.py		# 输出解析器
-│       prompt_template.py		# 提示词模板
-│       runnable.py				# 可调用的Agent或Chain
-│       state.py				# 节点状态类
-│       tool.py					# 工具定义
-│       workflow.py				# LangGraph流程图定义
-│
-├───common						# 通用模块
-│       constant.py				# 常量类
-│       context.py				# 会话上下文管理器
-│       database.py				# 数据库连接
-│       exception.py			# 异常类
-│       log.py					# 日志类
-│       properties.py			# 配置文件
-│       util.py					# 工具类
-│
-├───model						# 数据模型类
-│       dto.py					# DTO类
-│       entity.py				# 实体类
-│       result.py				# 响应结果类
-│       schema.py				# 数据库模式类
-│       vo.py					# VO类
-│
-└───server						# 服务端业务模块
-    │   app.py					# FastAPI APP配置
-    │   handler.py				# 全局异常处理器
-    │   interceptor.py			# 请求拦截器
+└───src
+    │   Application.py          # 项目启动入口
     │
-    ├───agent						# Agent接口层
-    │       HotspotAgent.py			# 热门景点推荐Agent
-    │       TitleGenerator.py		# 标题生成器
-    │       TravelChatAgent.py		# 旅行规划Agent
-    │       TravelGuideAgent.py		# 旅游向导Agent
+    ├───agent                   # Agent模块
+    │       llm.py              # 大模型实例对象
+    │       message.py          # 自定义消息类
+    │       model.py            # Pydantic模型类
+    │       node.py             # LangGraph节点函数
+    │       output_parser.py    # 输出解析器
+    │       prompt_template.py  # 提示词模板
+    │       runnable.py         # 可调用的Agent或Chain
+    │       state.py            # 节点状态类
+    │       tool.py             # 工具定义
+    │       workflow.py         # LangGraph流程图定义
+    │       __init__.py
     │
-    ├───controller					# 控制器层
-    │       AdminController.py		# 管理端路由
-    │       ChatController.py		# 旅游规划路由
-    │       HistoryController.py	# 历史记录路由
-    │       HotspotController.py	# 热门景点路由
-    │       SuggestionController.py	# 意见反馈路由
-    │       UploadController.py		# 文件上传路由
-    │       UserController.py		# 用户路由
+    ├───common              # 通用模块
+    │       constant.py     # 常量类
+    │       context.py      # 会话上下文管理器
+    │       database.py     # 数据库连接
+    │       exception.py    # 异常类
+    │       log.py          # 日志类
+    │       properties.py   # 配置文件
+    │       util.py         # 工具类
+    │       __init__.py
     │
-    ├───mapper						# 数据库访问层
-    │       AdminMapper.py			# 管理员表
-    │       SuggestionMapper.py		# 意见表
-    │       UserHistoryMapper.py	# 用户历史会话表
-    │       UserMapper.py			# 用户表
+    ├───model               # 数据模型类
+    │       dto.py          # DTO类
+    │       entity.py       # 实体类
+    │       result.py       # 响应结果类
+    │       schema.py       # 数据库模式类
+    │       vo.py           # VO类
+    │       __init__.py
     │
-    └───service						# 业务逻辑层
-            AdminService.py			# 管理端业务
-            ChatService.py			# 旅游规划业务
-            GuideService.py			# 旅游向导业务
-            HistoryService.py		# 历史会话业务
-            HotspotService.py		# 热门景点业务
-            SuggestionService.py	# 意见反馈业务
-            UserService.py			# 用户业务
+    └───server              # 服务端业务模块
+        │   app.py          # FastAPI APP配置
+        │   handler.py      # 全局异常处理器
+        │   interceptor.py  # 请求拦截器
+        │   __init__.py
+        │
+        ├───agent                       # Agent接口层
+        │       HotspotAgent.py         # 热门景点推荐Agent
+        │       TitleGenerator.py       # 标题生成器
+        │       TravelChatAgent.py      # 旅行规划Agent
+        │       TravelGuideAgent.py     # 旅游向导Agent
+        │       __init__.py
+        │
+        ├───controller                  # 控制器层
+        │       AdminController.py      # 管理端路由
+        │       ChatController.py       # 旅游规划路由
+        │       HistoryController.py    # 历史记录路由
+        │       HotspotController.py    # 热门景点路由
+        │       SuggestionController.py # 意见反馈路由
+        │       UploadController.py     # 文件上传路由
+        │       UserController.py       # 用户路由
+        │       __init__.py
+        │
+        ├───mapper                      # 数据库访问层
+        │       AdminMapper.py          # 管理员表
+        │       SuggestionMapper.py     # 意见表
+        │       UserHistoryMapper.py    # 用户历史会话表
+        │       UserMapper.py           # 用户表
+        │       __init__.py
+        │
+        └───service                     # 业务逻辑层
+                AdminService.py         # 管理端业务
+                ChatService.py          # 旅游规划业务
+                GuideService.py         # 旅游向导业务
+                HistoryService.py       # 历史会话业务
+                HotspotService.py       # 热门景点业务
+                SuggestionService.py    # 意见反馈业务
+                UserService.py          # 用户业务
+                __init__.py
 ```
 
 ## 环境依赖
