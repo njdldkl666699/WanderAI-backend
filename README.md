@@ -4,6 +4,10 @@
 
 漫游精灵后端项目，项目介绍详见前端项目。
 
+用户端前端项目：[MineGuYan/WanderAI-FrontEnd: 一款辅助旅行计划制定的 AI 助手的前端](https://github.com/MineGuYan/WanderAI-FrontEnd)
+
+管理端前端项目：[MineGuYan/wanderai-adminend: 漫游精灵管理层前端](https://github.com/MineGuYan/wanderai-adminend)
+
 ## 项目结构
 
 ```
