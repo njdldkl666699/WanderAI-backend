@@ -88,7 +88,7 @@ async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessage
             )
 
         # 用户图片+文本信息
-        if isinstance(message, HumanMessage) and isinstance(message.content, list):
+        elif isinstance(message, HumanMessage) and isinstance(message.content, list):
             # 转换OpenAI格式为自定义格式
             image_url = ""
             text_content = ""
@@ -108,13 +108,13 @@ async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessage
             )
 
         # AI文本信息
-        if isinstance(message, AIMessage) and isinstance(message.content, str):
+        elif isinstance(message, AIMessage) and isinstance(message.content, str):
             history_messages.append(
                 HistoryMessageVO(role="ai", type="chat", message=message.content)
             )
 
         # AI非纯文本信息
-        if isinstance(message, AIMessage) and isinstance(message.content, list):
+        elif isinstance(message, AIMessage) and isinstance(message.content, list):
             message_list = message.content
             # 旅行规划信息
             if len(message_list) == 1:
@@ -127,7 +127,7 @@ async def get_chat_content_by_session_id(session_id: str) -> list[HistoryMessage
                     )
 
             # 音频+文本信息
-            if len(message_list) == 2:
+            elif len(message_list) == 2:
                 # 转换OpenAI格式为自定义格式
                 audio_url = ""
                 text_content = ""

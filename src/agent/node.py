@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.prebuilt import create_react_agent
 
 from agent.llm import executor_llm, visual_llm
@@ -19,7 +19,7 @@ from agent.prompt_template import (
     planning_prompt_template,
     summary_prompt_template,
     text_prompt_template,
-    visual_prompt,
+    visual_prompt_template,
 )
 from agent.runnable import chat_agent, intent_chain, plan_agent, summary_agent, text_agent
 from agent.state import TravelGuideState, TravelPlanState
@@ -224,20 +224,10 @@ def should_plan_or_chat(state: TravelPlanState) -> str:
 
 def visual_node(state: TravelGuideState) -> TravelGuideState:
     """视觉模型节点"""
-    # 历史消息追加用户输入和图片URL
-    state["messages"].append(HumanImageMessage(state["image_url"], state["user_input"]))
 
-    messages: list[BaseMessage] = []
-    for message in state["messages"]:
-        # 如果是AI音频+文本消息，则跳过
-        if isinstance(message, AIMessage) and isinstance(message.content, list):
-            if len(message.content) == 2:
-                continue
+    visual_prompt = visual_prompt_template.format(messages=state["messages"])
 
-        messages.append(message)
-
-    messages.append(HumanImageMessage(state["image_url"], visual_prompt))
-    response = visual_llm.invoke(messages)
+    response = visual_llm.invoke([HumanImageMessage(state["image_url"], visual_prompt)])
     if isinstance(response.content, str):
         state["visual_result"] = response.content
 
@@ -259,6 +249,9 @@ def text_node(state: TravelGuideState) -> TravelGuideState:
     )
     ai_result = response["messages"][-1].content
     state["text_result"] = ai_result
+
+    # 历史消息追加用户输入和图片URL
+    state["messages"].append(HumanImageMessage(state["image_url"], state["user_input"]))
 
     # 追加文本AI返回的消息
     # 在Service层处理

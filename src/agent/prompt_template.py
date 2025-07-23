@@ -301,7 +301,14 @@ summary_prompt_template = ChatPromptTemplate.from_template(
 )
 
 
-visual_prompt = """这张图片是用户拍摄的某景点照片，请你描述一下照片，以及照片在哪个景点"""
+visual_prompt_template = ChatPromptTemplate.from_template(
+    """
+这张图片是用户拍摄的某景点照片，请你描述一下照片，以及照片在哪个景点
+
+历史会话如下：
+{messages}
+"""
+)
 
 text_prompt_template = ChatPromptTemplate.from_template(
     """

@@ -90,9 +90,9 @@ async def create_audio_output(
     # 将音频URL添加到旅行导游状态
     final_state.values["messages"].append(AIAudioMessage(audio_url, text_result))
 
-    # 更新旅行计划图状态的历史消息
+    # 更新旅行计划图状态的历史消息，追加最后两条
     plan_state = await TravelChatAgent.get_or_create_state(graph, "", session_id)
-    plan_state["messages"].extend(final_state.values["messages"])
+    plan_state["messages"].extend(final_state.values["messages"][-2:])  # 保留最后两条消息
     await graph.aupdate_state(
         {"configurable": {"thread_id": session_id}}, plan_state, as_node="__start__"
     )
