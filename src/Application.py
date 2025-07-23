@@ -1,19 +1,29 @@
 import uvicorn
 
 from common.log import log
+from common.properties import (
+    UVICORN_HOST,
+    UVICORN_PORT,
+    UVICORN_TIMEOUT_KEEP_ALIVE,
+)
 from server.app import app
 
-if __name__ == "__main__":
+
+def main():
     # 在启动服务器前配置日志
     log.info("正在启动 FastAPI 服务器...")
 
     # 启动服务器，禁用 uvicorn 的默认日志配置
     uvicorn.run(
         app,
-        host="0.0.0.0",
-        port=8080,
+        host=UVICORN_HOST,
+        port=UVICORN_PORT,
         reload=False,  # 调试时禁用热重载
         log_config=None,  # 禁用 uvicorn 默认日志配置
         access_log=True,  # 启用访问日志
-        timeout_keep_alive=120,  # 设置连接保持活动的超时时间
+        timeout_keep_alive=UVICORN_TIMEOUT_KEEP_ALIVE,
     )
+
+
+if __name__ == "__main__":
+    main()

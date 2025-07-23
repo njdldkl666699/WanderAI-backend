@@ -1,6 +1,7 @@
 import atexit
 import copy
 import logging
+import os
 import sys
 from datetime import datetime
 
@@ -119,6 +120,11 @@ def create_console_handler():
 
 def create_file_handler():
     """创建文件处理器"""
+
+    # 确保日志目录存在
+    log_dir = os.path.dirname(LOG_FILE_PREFIX)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
 
     # 创建文件格式器
     file_formatter = logging.Formatter(

@@ -13,3 +13,7 @@ __pycache__/
 
 # Logs
 logs/
+
+# Build
+dist/
+src/WanderAI_backend.egg-info/

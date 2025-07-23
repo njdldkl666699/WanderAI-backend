@@ -6,6 +6,12 @@ from pydantic import BaseModel, Field, SecretStr
 # 配置文件
 load_dotenv()
 
+# Uvicorn配置
+UVICORN_HOST = os.getenv("UVICORN_HOST", "localhost")
+UVICORN_PORT = int(os.getenv("UVICORN_PORT", "8080"))
+UVICORN_TIMEOUT_KEEP_ALIVE = int(os.getenv("UVICORN_TIMEOUT_KEEP_ALIVE", "5"))
+
+
 # 数据库配置
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")

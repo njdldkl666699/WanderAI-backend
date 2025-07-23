@@ -112,16 +112,20 @@ git clone https://github.com/njdldkl666699/WanderAI-backend.git
 
 ### 安装依赖
 
-```bash
-pip install -r requirements.txt
-```
+按照`pyproject.toml`中的依赖安装项目所需的 Python 包。
 
 ### 配置环境变量
 
 在项目根目录下创建一个`.env`文件，并配置以下环境变量：
 
-```
-# 数据库配置（MySQL数据库，也可以使用其他数据库，需要在properties.py中修改数据库连接字符串
+```properties
+# Uvicorn配置（可选）
+UVICORN_HOST=0.0.0.0
+UVICORN_PORT=8080
+UVICORN_TIMEOUT_KEEP_ALIVE=120
+
+# 数据库配置
+# 使用MySQL 数据库，也可以使用其他数据库，需要在 properties.py 中修改数据库连接字符串
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=wanderer
@@ -132,20 +136,18 @@ DB_NAME=wander_ai
 DB_POOL_SIZE=5
 DB_MAX_OVERFLOW=10
 
-
-# Redis配置（密码可选）
+# Redis 配置（密码可选）
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_DB=2
 REDIS_PASSWORD=<your_redis_password>
 
-# 阿里云OSS配置
+# 阿里云 OSS 配置
 OSS_ACCESS_KEY_ID=<your_oss_access_key_id>
 OSS_ACCESS_KEY_SECRET=<your_oss_access_key_secret>
 OSS_REGION=<your_oss_region>
 OSS_BUCKET_NAME=<your_oss_bucket_name>
 OSS_ENDPOINT=<your_oss_endpoint>
-
 
 # 日志配置（可选）
 LOG_LEVEL=DEBUG
@@ -157,32 +159,32 @@ LOG_INTERVAL=1
 LOG_FILE_SUFFIX="%Y-%m-%d.log"
 LOG_SUFFIX_REGEX="^\d{4}-\d{2}-\d{2}.log$"
 
-
-# JWT配置（除密钥，其他可选）
+# JWT 配置（除密钥，其他可选）
 JWT_SECRET_KEY=<your_jwt_secret_key>
 JWT_TTL_MINUTES=300
 JWT_ALGORITHM=HS256
 JWT_TOKEN_NAME=Authentication
 
-
 # 大模型配置
 DASHSCOPE_API_KEY=<your_dashscope_api_key>
 
-# 高德地图API
+# 高德地图 API
 AMAP_API_KEY=<your_amap_api_key>
 
-# 接口盒子API
+# 接口盒子 API
 APIHZ_ID=<your_apihz_id>
 APIHZ_KEY=<your_apihz_key>
 
 # Tavily API
 TAVILY_API_KEY=<your_tavily_api_key>
 
-# LangSmith配置
+# LangSmith 配置（可选）
+# 如果不使用 LangSmith 进行追踪，可以忽略以下配置
 LANGSMITH_TRACING=true
 LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 LANGSMITH_API_KEY=<your_langsmith_api_key>
 LANGCHAIN_TRACING_V2_CONSOLE=false
+
 ```
 
 ### 启动数据库
@@ -191,23 +193,11 @@ LANGCHAIN_TRACING_V2_CONSOLE=false
 
 ### 运行项目
 
-项目启动本身非常简单，只需运行根目录下的 Application.py 即可。
+项目启动本身非常简单，只需运行 `src/Application.py` 即可。
 
 ```bash
-python Application.py
+python src/Application.py
 ```
-
-## 技术实现
-
-### 架构实现
-
-### 数据库实现
-
-### 接口调用
-
-### 软件安全
-
-### 性能优化
 
 ## 项目贡献与联系方式
 
