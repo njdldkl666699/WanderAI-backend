@@ -182,7 +182,7 @@ VISUAL_CONFIG = LLMConfig(
 
 # 文本生成LLM配置
 TEXT_CONFIG = LLMConfig(
-    model="qwen-plus",
+    model="qwen-plus-latest",
     api_key=QWEN_API_KEY,
     base_url=QWEN_BASE_URL,
     temperature=0.6,
