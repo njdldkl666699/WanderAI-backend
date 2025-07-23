@@ -38,7 +38,7 @@ def setup_database_middleware(app: FastAPI):
 def setup_user_jwt_middleware(app: FastAPI):
     """校验用户jwt"""
     # 设置路径拦截器
-    path_interceptor = PathInterceptor()
+    path_interceptor = PathMatcher()
     path_interceptor.add_path_patterns("/api/user/**")
     path_interceptor.exclude_path_patterns(["/api/user/user/login", "/api/user/user/register"])
 
@@ -78,7 +78,7 @@ def setup_user_jwt_middleware(app: FastAPI):
 def setup_admin_jwt_middleware(app: FastAPI):
     """校验管理员jwt"""
     # 设置路径拦截器
-    path_interceptor = PathInterceptor()
+    path_interceptor = PathMatcher()
     path_interceptor.add_path_patterns("/api/admin/**")
     path_interceptor.exclude_path_patterns("/api/admin/login")
 
@@ -115,7 +115,9 @@ def setup_admin_jwt_middleware(app: FastAPI):
             )
 
 
-class PathInterceptor:
+class PathMatcher:
+    """路径匹配器，用于拦截特定路径的请求"""
+
     def __init__(self):
         self.include_patterns: List[re.Pattern] = []
         self.exclude_patterns: List[re.Pattern] = self._compile_patterns(RESOURCE_PATHS)
