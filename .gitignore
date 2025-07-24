@@ -2,6 +2,9 @@
 .vscode/
 .idea/
 
+# Plugins
+.VSCodeCounter
+
 # OS
 .DS_Store
 Thumbs.db
