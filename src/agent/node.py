@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
 from langgraph.prebuilt import create_react_agent
 
 from agent.llm import executor_llm, visual_llm
@@ -54,7 +54,21 @@ def intent_recognition_node(state: TravelPlanState) -> TravelPlanState:
 def chat_node(state: TravelPlanState) -> TravelPlanState:
     """普通聊天Agent节点"""
 
-    messages = state["messages"]
+    messages: list[BaseMessage] = []
+    for message in state["messages"]:
+        if isinstance(message, AIMessage) and isinstance(message.content, list):
+            message_list = message.content
+            if len(message_list) == 2:
+                # 去除音频URL
+                text_content = ""
+                for item in message_list:  # type: ignore
+                    item: dict[str, str] = item
+                    if item["type"] == "text":
+                        text_content = item["text"]
+                # 追加文本消息
+                messages.append(AIMessage(text_content))
+        else:
+            messages.append(message)
 
     response = chat_agent.invoke({"messages": messages})
     ai_response = response["messages"][-1].content
