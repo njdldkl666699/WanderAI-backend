@@ -247,7 +247,7 @@ insert into admin values("12345678", "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86
 
 ### 下载 .whl 包并安装
 
-从 [releases]() 页面下载最新的 `wanderai_backend-1.0.0-py3-none-any.whl` 文件。
+从 [Releases](https://github.com/njdldkl666699/WanderAI-backend/releases/tag/v1.0.0) 页面下载 `wanderai_backend-1.0.0-py3-none-any.whl` 文件。
 
 ```bash
 pip install wanderai_backend-1.0.0-py3-none-any.whl
