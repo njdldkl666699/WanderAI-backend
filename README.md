@@ -12,91 +12,94 @@
 
 ```
 WanderAI-backend
-│   .env						# 环境配置
-│   .gitignore					# .gitignore文件
-│   LICENSE.md                  # 许可证
-│   pyproject.toml				# Python项目配置
-│   README.md					# README
-│   wander_ai.sql               # 数据库脚本
+│   .env			# 环境配置
+│   .gitignore      # .gitignore文件
+│   LICENSE.md      # 许可证
+│   pyproject.toml	# Python项目配置
+│   README.md		# README
+│   wander_ai.sql   # 数据库脚本
 │
 └───src
-    │   Application.py          # 项目启动入口
-    │
-    ├───agent                   # Agent模块
-    │       llm.py              # 大模型实例对象
-    │       message.py          # 自定义消息类
-    │       model.py            # Pydantic模型类
-    │       node.py             # LangGraph节点函数
-    │       output_parser.py    # 输出解析器
-    │       prompt_template.py  # 提示词模板
-    │       runnable.py         # 可调用的Agent或Chain
-    │       state.py            # 节点状态类
-    │       tool.py             # 工具定义
-    │       workflow.py         # LangGraph流程图定义
-    │       __init__.py
-    │
-    ├───common              # 通用模块
-    │       constant.py     # 常量类
-    │       context.py      # 会话上下文管理器
-    │       database.py     # 数据库连接
-    │       exception.py    # 异常类
-    │       log.py          # 日志类
-    │       properties.py   # 配置文件
-    │       util.py         # 工具类
-    │       __init__.py
-    │
-    ├───model               # 数据模型类
-    │       dto.py          # DTO类
-    │       entity.py       # 实体类
-    │       result.py       # 响应结果类
-    │       schema.py       # 数据库模式类
-    │       vo.py           # VO类
-    │       __init__.py
-    │
-    └───server              # 服务端业务模块
-        │   app.py          # FastAPI APP配置
-        │   handler.py      # 全局异常处理器
-        │   interceptor.py  # 请求拦截器
-        │   __init__.py
+    └───wanderai
+        │   Application.py          # 项目启动入口
         │
-        ├───agent                       # Agent接口层
-        │       HotspotAgent.py         # 热门景点推荐Agent
-        │       TitleGenerator.py       # 标题生成器
-        │       TravelChatAgent.py      # 旅行规划Agent
-        │       TravelGuideAgent.py     # 旅游向导Agent
+        ├───agent                   # Agent模块
+        │       llm.py              # 大模型实例对象
+        │       message.py          # 自定义消息类
+        │       wanderai.model.py   # Pydantic模型类
+        │       node.py             # LangGraph节点函数
+        │       output_parser.py    # 输出解析器
+        │       prompt_template.py  # 提示词模板
+        │       runnable.py         # 可调用的Agent或Chain
+        │       state.py            # 节点状态类
+        │       tool.py             # 工具定义
+        │       workflow.py         # LangGraph流程图定义
         │       __init__.py
         │
-        ├───controller                  # 控制器层
-        │       AdminController.py      # 管理端路由
-        │       ChatController.py       # 旅游规划路由
-        │       HistoryController.py    # 历史记录路由
-        │       HotspotController.py    # 热门景点路由
-        │       SuggestionController.py # 意见反馈路由
-        │       UploadController.py     # 文件上传路由
-        │       UserController.py       # 用户路由
+        ├───common              # 通用模块
+        │       constant.py     # 常量类
+        │       context.py      # 会话上下文管理器
+        │       database.py     # 数据库连接
+        │       exception.py    # 异常类
+        │       log.py          # 日志类
+        │       properties.py   # 配置文件
+        │       util.py         # 工具类
         │       __init__.py
         │
-        ├───mapper                      # 数据库访问层
-        │       AdminMapper.py          # 管理员表
-        │       SuggestionMapper.py     # 意见表
-        │       UserHistoryMapper.py    # 用户历史会话表
-        │       UserMapper.py           # 用户表
+        ├───model               # 数据模型类
+        │       dto.py          # DTO类
+        │       entity.py       # 实体类
+        │       result.py       # 响应结果类
+        │       schema.py       # 数据库模式类
+        │       vo.py           # VO类
         │       __init__.py
         │
-        └───service                     # 业务逻辑层
-                AdminService.py         # 管理端业务
-                ChatService.py          # 旅游规划业务
-                GuideService.py         # 旅游向导业务
-                HistoryService.py       # 历史会话业务
-                HotspotService.py       # 热门景点业务
-                SuggestionService.py    # 意见反馈业务
-                UserService.py          # 用户业务
-                __init__.py
+        └───server              # 服务端业务模块
+            │   app.py          # FastAPI APP配置
+            │   handler.py      # 全局异常处理器
+            │   interceptor.py  # 请求拦截器
+            │   __init__.py
+            │
+            ├───agent                       # Agent接口层
+            │       HotspotAgent.py         # 热门景点推荐Agent
+            │       TitleGenerator.py       # 标题生成器
+            │       TravelChatAgent.py      # 旅行规划Agent
+            │       TravelGuideAgent.py     # 旅游向导Agent
+            │       __init__.py
+            │
+            ├───controller                  # 控制器层
+            │       AdminController.py      # 管理端路由
+            │       ChatController.py       # 旅游规划路由
+            │       HistoryController.py    # 历史记录路由
+            │       HotspotController.py    # 热门景点路由
+            │       SuggestionController.py # 意见反馈路由
+            │       UploadController.py     # 文件上传路由
+            │       UserController.py       # 用户路由
+            │       __init__.py
+            │
+            ├───mapper                      # 数据库访问层
+            │       AdminMapper.py          # 管理员表
+            │       SuggestionMapper.py     # 意见表
+            │       UserHistoryMapper.py    # 用户历史会话表
+            │       UserMapper.py           # 用户表
+            │       __init__.py
+            │
+            └───service                     # 业务逻辑层
+                    AdminService.py         # 管理端业务
+                    ChatService.py          # 旅游规划业务
+                    GuideService.py         # 旅游向导业务
+                    HistoryService.py       # 历史会话业务
+                    HotspotService.py       # 热门景点业务
+                    SuggestionService.py    # 意见反馈业务
+                    UserService.py          # 用户业务
+                    __init__.py
 ```
 
-## 环境依赖
+## 环境
 
-### 软件依赖
+### 依赖说明
+
+#### 软件依赖
 
 - Python 3.12.11
 
@@ -104,7 +107,7 @@ WanderAI-backend
 
 - Redis
 
-### API 依赖
+#### API 依赖
 
 - 阿里云百炼平台
 
@@ -118,19 +121,7 @@ WanderAI-backend
 
 - LangSmith（可选）
 
-## 构建和运行
-
-### 克隆项目
-
-```bash
-git clone https://github.com/njdldkl666699/WanderAI-backend.git
-```
-
-### 安装依赖
-
-按照`pyproject.toml`中的依赖安装项目所需的 Python 包。
-
-### 配置环境变量
+### 环境变量配置
 
 在项目根目录下创建一个`.env`文件，并配置以下环境变量：
 
@@ -203,7 +194,7 @@ LANGCHAIN_TRACING_V2_CONSOLE=false
 
 ```
 
-### 配置和启动数据库
+### 数据库配置
 
 #### 创建关系型数据库模式
 
@@ -252,12 +243,51 @@ insert into admin values("12345678", "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86
 
 启动 MySQL 或自行配置的数据库，并启动 Redis。
 
-### 运行项目
+## 安装项目
 
-项目启动本身非常简单，只需运行 `src/Application.py` 即可。
+### 下载 .whl 包并安装
+
+从 [releases]() 页面下载最新的 `wanderai_backend-1.0.0-py3-none-any.whl` 文件。
 
 ```bash
-python src/Application.py
+pip install wanderai_backend-1.0.0-py3-none-any.whl
+```
+
+### 从源码构建项目并安装
+
+```bash
+git clone https://github.com/njdldkl666699/WanderAI-backend.git
+cd WanderAI-backend
+python -m build
+pip install dist/wanderai_backend-1.0.0-py3-none-any.whl
+```
+
+## 启动项目
+
+### 使用命令行启动
+
+在命令行所在目录下配置.env 文件后，直接运行以下命令：
+
+```bash
+wanderai-server
+```
+
+### 使用 Uvicorn 启动
+
+在项目根目录下配置.env 文件后，使用以下命令启动：
+
+```bash
+pip install -e .
+uvicorn src.wanderai.server.app:app [其他参数]
+```
+
+#### 使用 Python 启动
+
+在项目根目录下配置.env 文件后，使用以下命令启动：
+
+```bash
+pip install -e .
+python src/wanderai/Application.py
 ```
 
 ## 项目贡献与联系方式

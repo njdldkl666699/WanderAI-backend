@@ -1,14 +1,10 @@
-[build-system]
-requires= ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "WanderAI-backend"
-version = "0.1.0"
+version = "1.0.0"
 description = "WanderAI服务器"
 authors = [
-    {name = "njdldkl", email = "2312454@mail.nankai.edu.cn"},
-    {name = "qingzhou"}
+    { name = "njdldkl", email = "2312454@mail.nankai.edu.cn" },
+    { name = "qingzhou" },
 ]
 license = "LGPL-3.0-or-later"
 readme = "README.md"
@@ -33,9 +29,15 @@ dependencies = [
     "python-jose>=3.5.0",
     "redis>=6.2.0",
     "sqlalchemy>=2.0.41",
-    "uvicorn>=0.35.0"
+    "uvicorn>=0.35.0",
 ]
 
 [project.urls]
 Repository = "https://github.com/njdldkl666699/WanderAI-backend"
 
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+wanderai-server = "wanderai.Application:main"
